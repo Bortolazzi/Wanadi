@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 25.0.1706.8
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wanadi.Common", "Wanadi.Common\Wanadi.Common.csproj", "{1E373CB1-01B2-42FB-947F-711307C84DA3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wanadi.MySql", "Wanadi.MySql\Wanadi.MySql.csproj", "{8A89EE8C-B2A7-405E-A04A-A68E94266C87}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wanadi.MySql.Examples", "Wanadi.MySql.Examples\Wanadi.MySql.Examples.csproj", "{E05C2D5A-89CA-4E01-98CE-A9DD963C1EB8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1E373CB1-01B2-42FB-947F-711307C84DA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E373CB1-01B2-42FB-947F-711307C84DA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E373CB1-01B2-42FB-947F-711307C84DA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E373CB1-01B2-42FB-947F-711307C84DA3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A89EE8C-B2A7-405E-A04A-A68E94266C87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A89EE8C-B2A7-405E-A04A-A68E94266C87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A89EE8C-B2A7-405E-A04A-A68E94266C87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A89EE8C-B2A7-405E-A04A-A68E94266C87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E05C2D5A-89CA-4E01-98CE-A9DD963C1EB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E05C2D5A-89CA-4E01-98CE-A9DD963C1EB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E05C2D5A-89CA-4E01-98CE-A9DD963C1EB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E05C2D5A-89CA-4E01-98CE-A9DD963C1EB8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {08BBF453-D364-4461-B595-5C199639D79C}
+	EndGlobalSection
+EndGlobal
