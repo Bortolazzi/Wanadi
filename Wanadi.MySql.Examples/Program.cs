@@ -9,6 +9,7 @@ using Wanadi.MySql.Wrappers;
 CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("pt-BR");
 CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("pt-BR");
 
+///Test
 await TestPerformanceBetweenEFAndDWAsync(1000);
 
 //1.000 records in EF elapsed in 00:00:09.4387130
