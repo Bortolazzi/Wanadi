@@ -1,11 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>6.0.0</Version>
+    <Version>6.0.1</Version>
     <Authors>Renato Bortolazzi Junior</Authors>
-    <PackageDescription>Pacote de funções comuns utilizadas no Wanadi.MySql.</PackageDescription>
-  </PropertyGroup>
+    <PackageDescription>Funcionalidades comuns utilizadas em projetos e no Wanadi.MySql.</PackageDescription>
+    <RepositoryUrl>https://github.com/Bortolazzi/Wanadi</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Include="../README.md" Pack="true" PackagePath="/" />
+	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ProgramSynthesis.Detection" Version="8.31.0" />
+  </ItemGroup>
 </Project>

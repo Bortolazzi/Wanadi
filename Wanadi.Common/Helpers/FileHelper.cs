@@ -1,0 +1,253 @@
+﻿using System.Security.Cryptography;
+using Microsoft.ProgramSynthesis.Detection.Encoding;
+
+namespace Wanadi.Common.Helpers;
+
+public static class FileHelper
+{
+    public static string HashMD5(string fileName)
+    {
+        using (MD5 md5Generate = MD5.Create())
+        using (FileStream fileStream = File.OpenRead(fileName))
+            return Convert.ToBase64String(md5Generate.ComputeHash(fileStream));
+    }
+
+    #region [Read all text]
+
+    public static string Read(string filePath)
+        => FileHelper.Read(filePath, FileHelper.DetectEncoding(filePath));
+
+    public static string Read(string filePath, Encoding encodingFile)
+    {
+        using (var fileStream = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+        using (var streamReader = new StreamReader(fileStream, encodingFile))
+            return streamReader.ReadToEnd();
+    }
+
+    public static async Task<string> ReadAsync(string filePath)
+       => await FileHelper.ReadAsync(filePath, FileHelper.DetectEncoding(filePath));
+
+    public static async Task<string> ReadAsync(string filePath, Encoding encodingFile)
+    {
+        using (var fileStream = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+        using (var streamReader = new StreamReader(fileStream, encodingFile))
+            return await streamReader.ReadToEndAsync();
+    }
+
+    #endregion [Read all text]
+
+    #region [Read all lines]
+
+    public static List<string> ReadLines(string filePath)
+        => FileHelper.ReadLines(filePath, FileHelper.DetectEncoding(filePath));
+
+    public static List<string> ReadLines(string filePath, Encoding encodingFile)
+    {
+        var response = new List<string>();
+
+        using (var fileStream = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+        using (var streamReader = new StreamReader(fileStream, encodingFile))
+        {
+            string? _line = null;
+            while ((_line = streamReader.ReadLine()) != null)
+                response.Add(_line);
+        }
+
+        return response;
+    }
+
+    public static async Task<List<string>> ReadLinesAsync(string filePath)
+        => await FileHelper.ReadLinesAsync(filePath, FileHelper.DetectEncoding(filePath));
+
+    public static async Task<List<string>> ReadLinesAsync(string filePath, Encoding encodingFile)
+    {
+        var response = new List<string>();
+
+        using (var fileStream = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+        using (var streamReader = new StreamReader(fileStream, encodingFile))
+        {
+            string? _line = null;
+            while ((_line = await streamReader.ReadLineAsync()) != null)
+                response.Add(_line);
+        }
+
+        return response;
+    }
+
+    #endregion [Read all lines]
+
+    #region [Create file]
+
+    public static void Create(string filePath, string content)
+        => FileHelper.Create(filePath, content, Encoding.UTF8);
+
+    public static void Create(string filePath, string content, Encoding encoding)
+    {
+        using (var _streamWriter = new StreamWriter(filePath, false, encoding))
+        {
+            _streamWriter.AutoFlush = true;
+            _streamWriter.Write(content);
+            _streamWriter.Flush();
+        }
+    }
+
+    public static async Task CreateAsync(string filePath, string content)
+        => await FileHelper.CreateAsync(filePath, content, Encoding.UTF8);
+
+    public static async Task CreateAsync(string filePath, string content, Encoding encoding)
+    {
+        using (var _streamWriter = new StreamWriter(filePath, false, encoding))
+        {
+            _streamWriter.AutoFlush = true;
+            await _streamWriter.WriteAsync(content);
+            await _streamWriter.FlushAsync();
+        }
+    }
+
+    public static void Create(string filePath, List<string> lines)
+        => FileHelper.Create(filePath, lines, Encoding.UTF8);
+
+    public static void Create(string filePath, List<string> lines, Encoding encoding)
+    {
+        using (var _streamWriter = new StreamWriter(filePath, false, encoding))
+        {
+            _streamWriter.AutoFlush = true;
+            lines.ForEach(_streamWriter.WriteLine);
+            _streamWriter.Flush();
+        }
+    }
+
+    public static async Task CreateAsync(string filePath, List<string> lines)
+        => await FileHelper.CreateAsync(filePath, lines, Encoding.UTF8);
+
+    public static async Task CreateAsync(string filePath, List<string> lines, Encoding encoding)
+    {
+        using (var _streamWriter = new StreamWriter(filePath, false, encoding))
+        {
+            _streamWriter.AutoFlush = true;
+
+            foreach (string line in lines)
+                await _streamWriter.WriteLineAsync(line);
+
+            await _streamWriter.FlushAsync();
+        }
+    }
+
+    #endregion [Create file]
+
+    #region [Append text]
+
+    public static void AppendText(string filePath, string content)
+       => FileHelper.AppendText(filePath, content, Encoding.UTF8);
+
+    public static void AppendText(string filePath, string content, Encoding encoding)
+    {
+        using (var _streamWriter = new StreamWriter(filePath, true, encoding))
+        {
+            _streamWriter.AutoFlush = true;
+            _streamWriter.WriteLine(content);
+            _streamWriter.Flush();
+        }
+    }
+
+    public static async Task AppendTextAsync(string filePath, string content)
+        => await FileHelper.AppendTextAsync(filePath, content, Encoding.UTF8);
+
+    public static async Task AppendTextAsync(string filePath, string content, Encoding encoding)
+    {
+        using (var _streamWriter = new StreamWriter(filePath, true, encoding))
+        {
+            _streamWriter.AutoFlush = true;
+            await _streamWriter.WriteLineAsync(content);
+            await _streamWriter.FlushAsync();
+        }
+    }
+
+    public static void AppendText(string filePath, List<string> lines)
+        => FileHelper.AppendText(filePath, lines, Encoding.UTF8);
+
+    public static void AppendText(string filePath, List<string> lines, Encoding encoding)
+    {
+        using (StreamWriter _streamWriter = new StreamWriter(filePath, true, encoding))
+        {
+            _streamWriter.AutoFlush = true;
+            lines.ForEach(_streamWriter.WriteLine);
+            _streamWriter.Flush();
+        }
+    }
+
+    public static async Task AppendTextAsync(string filePath, List<string> lines)
+        => await FileHelper.AppendTextAsync(filePath, lines, Encoding.UTF8);
+
+    public static async Task AppendTextAsync(string filePath, List<string> lines, Encoding encoding)
+    {
+        using (StreamWriter _streamWriter = new StreamWriter(filePath, true, encoding))
+        {
+            _streamWriter.AutoFlush = true;
+
+            foreach (string linha in lines)
+                await _streamWriter.WriteLineAsync(linha);
+
+            await _streamWriter.FlushAsync();
+        }
+    }
+
+    #endregion [Append text]
+
+    #region [Read first line]
+
+    public static string? ReadFirstLine(string filePath)
+        => ReadFirstLine(filePath, Encoding.UTF8);
+
+    public static string? ReadFirstLine(string filePath, Encoding fileEncoding)
+    {
+        using (FileStream fileStream = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+        using (StreamReader streamReader = new StreamReader(fileStream, fileEncoding))
+        {
+            return streamReader.ReadLine();
+        }
+    }
+
+    public static async Task<string?> ReadFirstLineAsync(string filePath)
+        => await ReadFirstLineAsync(filePath, Encoding.UTF8);
+
+    public static async Task<string?> ReadFirstLineAsync(string filePath, Encoding fileEncoding)
+    {
+        using (FileStream fileStream = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+        using (StreamReader streamReader = new StreamReader(fileStream, fileEncoding))
+        {
+            return await streamReader.ReadLineAsync();
+        }
+    }
+
+    #endregion [Read first line]
+
+    public static Encoding DetectEncoding(string filePath)
+    {
+        try
+        {
+            using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+            {
+                if (stream.CanSeek)
+                {
+                    // Read from the beginning if possible
+                    stream.Seek(0, SeekOrigin.Begin);
+                }
+
+                var encodingType = EncodingIdentifier.IdentifyEncoding(stream);
+                var encodingDotNetName = EncodingTypeUtils.GetDotNetName(encodingType);
+
+                if (!string.IsNullOrEmpty(encodingDotNetName))
+                {
+                    return Encoding.GetEncoding(encodingDotNetName);
+                }
+            }
+        }
+        catch
+        {
+            return Encoding.UTF8;
+        }
+
+        return Encoding.UTF8;
+    }
+}
