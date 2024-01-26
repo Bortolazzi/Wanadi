@@ -1,17 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <Version>8.0.0</Version>
-    <Authors>Renato Bortolazzi Junior</Authors>
-    <PackageDescription>Pacote de facilidades de mysql usando ADO.net</PackageDescription>
-  </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Wanadi.Common\Wanadi.Common.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="MySql.Data" Version="8.3.0" />
-  </ItemGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Version>8.0.1</Version>
+		<Authors>Renato Bortolazzi Junior</Authors>
+		<PackageDescription>Funcionalidades para facilitar execução de operações em MySql com .net core.</PackageDescription>
+		<RepositoryUrl>https://github.com/Bortolazzi/Wanadi</RepositoryUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Include="../README.md" Pack="true" PackagePath="/" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Wanadi.Common\Wanadi.Common.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="MySql.Data" Version="8.3.0" />
+	</ItemGroup>
 </Project>
