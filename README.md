@@ -18,7 +18,7 @@ A ideia é manter o projeto atualizado e crescendo com algumas funcionalidades q
 
 --------------------------------------------------------------------------------------------------  
 > [!WARNING]
-> Código está livre para leitura e críticas, atenção ao usá-lo. Fique à vontade para sugerir mudanças, abrir uma branch para ajudar a melhora-lo.
+> Código está livre para leitura e críticas, atenção ao usá-lo. Fique à vontade para sugerir mudanças, abrir uma branch para ajudar a melhorá-lo.
 
 --------------------------------------------------------------------------------------------------  
 # Wanadi.MySql - Como usar:
@@ -83,7 +83,7 @@ public enum Status
 [Table("myTable")]
 public class MyClass
 {
-    ///Será ignorado por ter o Atributo que informa que o mesmo é gerado pelo banco de dados
+    ///Será ignorado por ter o Atributo que informa que ele é gerado pelo banco de dados
     [Column("id"), DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 
@@ -196,7 +196,7 @@ var insertCommand = DataWrapper.GenerateInsertCommand(obj);
 | insertCommand.MySqlCommand       | "INSERT INTO \`myTable\` (\`name\`, \`status\`) VALUES ('Renato', 1);" |
 | insertCommand.MySqlCommandGetId  | "INSERT INTO \`myTable\` (\`name\`, \`status\`) VALUES ('Renato', 1); SELECT LAST_INSERT_ID();" |
 
-### Informando explícitamente o nome da tabela:
+### Informando explicitamente o nome da tabela:
 
 ```csharp
 
@@ -300,7 +300,7 @@ var sourceInserts1 = DataWrapper.GenerateInsertCommands(listToInsert);
 //#3 - INSERT INTO `myTable` (`id`, `name`, `active`) VALUES (0, 'Junior', 1);
 //#4 - INSERT INTO `myTable` (`id`, `name`, `active`) VALUES (0, 'Juninho', 0); 
 
-//Caso necessário, também pode ser alterado o nome da tabel explícitamente
+//Caso necessário, também pode ser alterado o nome da tabela explicitamente
 var sourceInserts2 = DataWrapper.GenerateInsertCommands("tableNames", listToInsert);
 //MySqlCommands:
 //#1 - INSERT INTO `tableNames` (`id`, `name`, `active`) VALUES (0, 'Renato', 1);
@@ -378,7 +378,7 @@ var sourceInserts1 = DataWrapper.GenerateBatchCommands(listToInsert, 2, false);
 //#1 - BatchCommand - Count = 2, MySqlCommand = "INSERT INTO `myTable` (`name`, `active`) VALUES ('Renato', 1), ('Bortolazzi', 1);
 //#2 - BatchCommand - Count = 2, MySqlCommand = "INSERT INTO `myTable` (`name`, `active`) VALUES ('Junior', 1), ('Juninho', 0);
 
-//Caso necessário, também pode ser alterado o nome da tabel explícitamente
+//Caso necessário, também pode ser alterado o nome da tabela explicitamente
 var sourceInserts2 = DataWrapper.GenerateBatchCommands("tableName", listToInsert, 2, false);
 //sourceInserts2 receberá 2 registros do tipo BatchCommand
 //#1 - BatchCommand - Count = 2, MySqlCommand = "INSERT INTO `tableName` (`name`, `active`) VALUES ('Renato', 1), ('Bortolazzi', 1);
@@ -573,3 +573,59 @@ var dataTable = await MySqlWrapper.FillAsync("SELECT * FROM myTable AS A INNER J
 ```
 
 </details>
+
+--------------------------------------------------------------------------------------------------  
+
+# Contribuição
+
+Caso veja algum ponto de melhoria, crítica construtivas são extremamente bem-vindas. Fique à vontade para abrir uma issue e/ou branch para sugerir melhorias.
+
+--------------------------------------------------------------------------------------------------  
+
+# Licença
+
+Licença MIT
+
+Direitos autorais (c) 2024 - Renato Bortolazzi Junior
+
+É concedida permissão, gratuitamente, a qualquer pessoa que obtenha uma cópia
+deste software e arquivos de documentação associados (o "Software"), para lidar
+no Software sem restrições, incluindo, sem limitação, os direitos
+usar, copiar, modificar, mesclar, publicar, distribuir, sublicenciar e/ou vender
+cópias do Software e permitir que as pessoas a quem o Software é
+capacitado para fazê-lo, sujeito às seguintes condições:
+
+O aviso de direitos autorais acima e este aviso de permissão serão incluídos em todos
+cópias ou partes substanciais do Software.
+
+O SOFTWARE É FORNECIDO "COMO ESTÁ", SEM GARANTIA DE QUALQUER TIPO, EXPRESSA OU
+IMPLÍCITAS, INCLUINDO, MAS NÃO SE LIMITANDO ÀS GARANTIAS DE COMERCIALIZAÇÃO,
+ADEQUAÇÃO A UM DETERMINADO FIM E NÃO VIOLAÇÃO. EM HIPÓTESE ALGUMA O
+OS AUTORES OU DETENTORES DE DIREITOS AUTORAIS SERÃO RESPONSÁVEIS POR QUALQUER RECLAMAÇÃO, DANOS OU OUTROS
+RESPONSABILIDADE, SEJA EM UMA AÇÃO DE CONTRATO, ATO ILÍCITO OU DE OUTRA FORMA, DECORRENTE DE,
+FORA DE OU EM CONEXÃO COM O SOFTWARE OU O USO OU OUTRAS NEGOCIAÇÕES NO
+PROGRAMAS.
+
+----
+
+MIT License
+
+Copyright (c) 2024 - Renato Bortolazzi Junior
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
