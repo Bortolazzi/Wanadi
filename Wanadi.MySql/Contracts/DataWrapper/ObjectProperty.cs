@@ -29,7 +29,7 @@ public class ObjectProperty
 
         if (PropertyType == typeof(string))
             AllowNull = true;
-
+        
         var databaseGenerated = propertyInfo.GetAttribute<DatabaseGeneratedAttribute>();
         if (databaseGenerated != null)
             IgnoreOnInsert = true;

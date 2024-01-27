@@ -1,6 +1,9 @@
-﻿using System.Diagnostics;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics;
 using System.Globalization;
+using Wanadi.Common.Enums;
 using Wanadi.Common.Extensions;
+using Wanadi.Common.Helpers;
 using Wanadi.MySql.Examples;
 using Wanadi.MySql.Examples.Data;
 using Wanadi.MySql.Examples.Data.Entities;
@@ -48,7 +51,7 @@ async Task TestPerformanceBetweenEFAndDWAsync(int recordsQuantity)
 async Task GenerateTableTestRecordsToTestUsingDataWrapperAsync(int recordsQuantity)
 {
     var sourceInsert = new List<TableTestEntity>();
-
+    
     for (int i = 0; i < recordsQuantity; i++)
     {
         sourceInsert.Add(new TableTestEntity()
@@ -66,7 +69,7 @@ async Task GenerateTableTestRecordsToTestUsingDataWrapperAsync(int recordsQuanti
     }
 
     DataWrapper.GuidOption = Wanadi.Common.Enums.GuidConditions.CastToString;
-    DataWrapper.EnumOption = Wanadi.Common.Enums.EnumConditions.CastToInt;
+    DataWrapper.EnumOption = Wanadi.Common.Enums.EnumConditions.CastToString;
 
     var batches = DataWrapper.GenerateBatchCommandsParallel(sourceInsert, 5000, false);
     int counter = 0;
