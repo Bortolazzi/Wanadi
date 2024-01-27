@@ -120,6 +120,23 @@ public class ValueProperty
         }
     }
 
+    /// <summary>
+    ///     <para>
+    ///         pt-BR: Nome da coluna para inserção no banco de dados.
+    ///     </para>
+    ///     <para>
+    ///         en-US: Column name to insert in database.
+    ///     </para>
+    /// </summary>
     public string ColumnName { get; set; }
+
+    /// <summary>
+    ///     <para>
+    ///         pt-BR: Valor pronto para inserção no banco de dados. Quando necessário já irá vir com aspas simples.
+    ///     </para>
+    ///     <para>
+    ///         en-US: Value ready for insert into the database. When necessary, it will come with single quotes.
+    ///     </para>
+    /// </summary>
     public string Value { get; set; }
 }

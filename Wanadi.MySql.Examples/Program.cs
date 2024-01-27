@@ -9,19 +9,13 @@ using Wanadi.MySql.Wrappers;
 CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("pt-BR");
 CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("pt-BR");
 
-///Test
-await TestPerformanceBetweenEFAndDWAsync(1000);
+/// pt-BR: Método para inserção e comparação de perfomance entre o EntityFramework Core (MySql) e o DataWrapper.
+/// en-US: Method for insertion and performance comparison between Entity Framework Core (MySql) and DataWrapper.
+await TestInsertPerformanceBetweenEFAndDWAsync(1000);
 
-//1.000 records in EF elapsed in 00:00:09.4387130
-//1.000 records in DW elapsed in 00:00:01.0554050
-
-//10.000 records in EF elapsed in 00:00:56.7174500
-//10.000 records in DW elapsed in 00:00:04.3088360
-
-//100.000 records in EF elapsed in 00:09:36.0190860
-//100.000 records in DW elapsed in 00:00:52.3876710
-
-async Task TestPerformanceBetweenEFAndDWAsync(int recordsQuantity)
+/// pt-BR: Método para inserção e comparação de perfomance entre o EntityFramework Core (MySql) e o DataWrapper.
+/// en-US: Method for insertion and performance comparison between Entity Framework Core (MySql) and DataWrapper.
+async Task TestInsertPerformanceBetweenEFAndDWAsync(int recordsQuantity)
 {
     var sw = new Stopwatch();
 
@@ -43,12 +37,22 @@ async Task TestPerformanceBetweenEFAndDWAsync(int recordsQuantity)
     sw.Stop();
     $"Insert with DW elapsed in {sw.Elapsed}".PrintWarning();
     Console.ReadKey();
+
+    //1.000 records in EF elapsed in 00:00:09.4387130
+    //1.000 records in DW elapsed in 00:00:01.0554050
+
+    //10.000 records in EF elapsed in 00:00:56.7174500
+    //10.000 records in DW elapsed in 00:00:04.3088360
+
+    //100.000 records in EF elapsed in 00:09:36.0190860
+    //100.000 records in DW elapsed in 00:00:52.3876710
+
 }
 
 async Task GenerateTableTestRecordsToTestUsingDataWrapperAsync(int recordsQuantity)
 {
     var sourceInsert = new List<TableTestEntity>();
-
+    
     for (int i = 0; i < recordsQuantity; i++)
     {
         sourceInsert.Add(new TableTestEntity()
