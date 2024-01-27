@@ -17,6 +17,23 @@ public class BatchCommand
             MySqlCommand = $"SET foreign_key_checks = 0; {MySqlCommand} SET foreign_key_checks = 1;";
     }
 
+    /// <summary>
+    ///		<para>
+    ///			pt-BR: Quantidade de registros contidos no comando em lote.
+    ///		</para>
+    ///		<para>
+    ///			en-US: Number of records contained in the batch command.
+    ///		</para>
+    /// </summary>
     public int Count { get; set; }
+
+    /// <summary>
+    ///     <para>
+    ///         pt-BR: Lote de comandos de inserção.
+    ///     </para>
+    ///     <para>
+    ///         en-US: Batch of insert commands.
+    ///     </para>
+    /// </summary>
 	public string MySqlCommand { get; set; }
 }

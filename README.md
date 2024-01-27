@@ -9,11 +9,26 @@ A ideia é manter o projeto atualizado e crescendo com algumas funcionalidades q
 * **NuGet Wanadi.MySql** https://www.nuget.org/packages/Wanadi.MySql
     - Disponível para .net6 e .net8
 
+--------------------------------------------------------------------------------------------------
+## Resultado de teste de inserção.
+### Comparação entre a utilização do DataWrapper e Entity Framework Core para Mysql.
+
+> Usando conexão com bando de dados em VPS na Alemanha. Localmente ambos são mais rápidos.
+
+| ORM           | Quantidade de Registros   | Tempo            | 
+| :---          | :---                      | :---             |
+| DataWrapper   | 1.000                     | 00:00:01.0554050 |
+| EF Core       | 1.000                     | 00:00:09.4387130 |
+| DataWrapper   | 10.000                    | 00:00:04.3088360 |
+| EF Core       | 10.000                    | 00:00:56.7174500 |
+| DataWrapper   | 100.000                   | 00:00:52.3876710 |
+| EF Core       | 100.000                   | 00:09:36.0190860 |
+
 --------------------------------------------------------------------------------------------------  
 ## ToDo List:
 - [x] Publicar primeira versão dos pacotes
-- [ ] Criar summaries no código para facilitar a utilização
-- [ ] Adicionar FileHelper (Para leitura e escrita de arquivos)
+- [X] Criar summaries no código para facilitar a utilização
+- [X] Adicionar FileHelper (Para leitura e escrita de arquivos)
 - [ ] Adicionar CsvHelper (Para ajudar na leitura de arquivos CSV e conversão para objetos tipados)
 
 --------------------------------------------------------------------------------------------------  
