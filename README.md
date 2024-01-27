@@ -13,7 +13,7 @@ A ideia é manter o projeto atualizado e crescendo com algumas funcionalidades q
 ## Resultado de teste de inserção.
 ### Comparação entre a utilização do DataWrapper e Entity Framework Core para Mysql.
 
-> Usando conexão com bando de dados em VPS na Alemanha. Localmente ambos são mais rápidos.
+> Usando conexão com banco de dados em VPS na Alemanha. Localmente ambos são mais rápidos.
 
 | ORM           | Quantidade de Registros   | Tempo            | 
 | :---          | :---                      | :---             |
