@@ -77,8 +77,24 @@ public class ObjectProperty
         CastTypeToMySql(enumOption, guidOption);
     }
 
+    /// <summary>
+    ///     <para>
+    ///         pt-BR: Nome da propriedade. Identica ao que está no código.
+    ///     </para>
+    ///     <para>
+    ///         en-US: Property name. Identical to what is in the code.
+    ///     </para>
+    /// </summary>
     public string Name { get; set; }
 
+    /// <summary>
+    ///     <para>
+    ///         pt-BR: Valor encontrado no ColumnAttribute. Caso não possua será retornado a propriedade Name. 
+    ///     </para>
+    ///     <para>
+    ///         en-US: Value found in ColumnAttribute. If not, the Name property will be returned.
+    ///     </para>
+    /// </summary>
     public string ColumnName
     {
         get { return _columnName ?? Name; }
@@ -86,24 +102,111 @@ public class ObjectProperty
     }
     private string? _columnName;
 
+    /// <summary>
+    ///     <para>
+    ///         pt-BR: Valor encontrado no MinimumLength do StringLengthAttribute ou nulo para as propriedades que não possuem.
+    ///     </para>
+    ///     <para>
+    ///         en-US: Value found in the MinimumLength of the StringLengthAttribute or null for properties that do not have it.
+    ///     </para>
+    /// </summary>
     public int? MinimumLength { get; set; }
 
+    /// <summary>
+    ///     <para>
+    ///         pt-BR: Valor encontrado no MaximumLength do StringLengthAttribute ou nulo para as propriedades que não possuem.
+    ///     </para>
+    ///     <para>
+    ///         en-US: Value found in the MaximumLength of the StringLengthAttribute or null for properties that do not have it.
+    ///     </para>
+    /// </summary>
     public int? MaximumLength { get; set; }
 
+    /// <summary>
+    ///     <para>
+    ///         pt-BR: Valor encontrado no Precision do DecimalPrecisionAttribute ou nulo para as propriedades que não possuem.
+    ///     </para>
+    ///     <para>
+    ///         en-US: Value found in the Precision of the DecimalPrecisionAttribute or null for properties that do not have it.
+    ///     </para>
+    /// </summary>
     public int? Precision { get; set; }
 
+    /// <summary>
+    ///     <para>
+    ///         pt-BR: Valor encontrado no Scale do DecimalPrecisionAttribute ou nulo para as propriedades que não possuem.
+    ///     </para>
+    ///     <para>
+    ///         en-US: Value found in the Scale of the DecimalPrecisionAttribute or null for properties that do not have it.
+    ///     </para>
+    /// </summary>
     public int? Scale { get; set; }
 
+    /// <summary>
+    ///     <para>
+    ///         pt-BR: Tipo da propriedade encontrada no objeto.
+    ///     </para>
+    ///     <para>
+    ///         en-US: Type of property found on the object.
+    ///     </para>
+    /// </summary>
     public Type PropertyType { get; set; }
 
+    /// <summary>
+    ///     <para>
+    ///         pt-BR: Indicador de apenas Data para as propriedades do tipo DateTime que possuem o atributo DataTypeAttribute(DataType.Date)
+    ///     </para>
+    ///     <para>
+    ///         en-US: Date-only indicator for DateTime properties that have the DataTypeAttribute(DataType.Date)
+    ///     </para>
+    /// </summary>
     public bool OnlyDate { get; set; } = false;
 
+    /// <summary>
+    ///     <para>
+    ///         pt-BR: Tipo de dado correspondente para Mysql.
+    ///     </para>
+    ///     <para>
+    ///         en-US: Corresponding data type for Mysql.
+    ///     </para>
+    /// </summary>
     public string MySqlType { get; set; }
 
+    /// <summary>
+    ///     <para>
+    ///         pt-BR: Indicador de remoção da propriedade para criação do comando de inserção.
+    ///     </para>
+    ///     <para>
+    ///         en-US: Property ignore indicator for creating the insert command.
+    ///     </para>
+    ///     <para>
+    ///         Exemplo de casos de remoção/Example of removal cases:
+    ///     </para>
+    ///
+    ///     <para>
+    ///         List, IList, Dictionary, Object, Classes, DatabaseGeneratedAttribute, Enum (DataWrapper.EnumOption = IgnoreOnInsert), Guid (DataWrapper.GuidOption = IgnoreOnInsert)
+    ///     </para>
+    /// </summary>
     public bool IgnoreOnInsert { get; set; }
 
+    /// <summary>
+    ///     <para>
+    ///         pt-BR: Indicador de propriedade que pode possuir valor NULL.
+    ///     </para>
+    ///     <para>
+    ///         en-US: Property indicator that can have a NULL value.
+    ///     </para>
+    /// </summary>
     public bool AllowNull { get; set; }
 
+    /// <summary>
+    ///     <para>
+    ///         pt-BR: Indicador de propriedade do tipo Enum.
+    ///     </para>
+    ///     <para>
+    ///         en-US: Enum type property indicator.
+    ///     </para>
+    /// </summary>
     public bool IsEnum { get; set; }
 
     private void CastTypeToMySql(EnumConditions enumOption, GuidConditions guidOption)

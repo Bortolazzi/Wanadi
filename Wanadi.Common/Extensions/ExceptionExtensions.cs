@@ -2,6 +2,38 @@
 
 public static class ExceptionExtensions
 {
+    /// <summary>
+    ///     <para>
+    ///         pt-BR: Transforma as principais propriedades de uma Exception em string e retorna concatenada.
+    ///     </para>
+    ///     <para>
+    ///         en-US: Transforms the main properties of an Exception into Text and returns concatenated.
+    ///     </para>
+    /// </summary>
+    /// <param name="exception">
+    ///     <para>
+    ///         pt-BR: Exception a ser transformada em string.
+    ///     </para>
+    ///     <para>
+    ///         en-US: Exception to be transformed into a string.
+    ///     </para>
+    /// </param>
+    /// <param name="recursive">
+    ///     <para>
+    ///         pt-BR: Se true irá recuperar as informações na InnerException. Se false irá ignorar.
+    ///     </para>
+    ///     <para>
+    ///         en-US: If true it will retrieve the information in the InnerException. If false it will ignore.
+    ///     </para>
+    /// </param>
+    /// <returns>
+    ///     <para>
+    ///         pt-BR: String contendo Message, Source, HelpLink, TargetSite, StackTrace, Data e InnerException.
+    ///     </para>
+    ///     <para>
+    ///         en-US: String containing Message, Source, HelpLink, TargetSite, StackTrace, Data and InnerException.
+    ///     </para>
+    /// </returns>
     public static string ToText(this Exception exception, bool recursive = true)
         => ToText(exception, new StringBuilder(), recursive).ToString();
 

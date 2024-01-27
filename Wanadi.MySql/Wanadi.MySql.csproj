@@ -3,7 +3,7 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<Version>6.0.1</Version>
+		<Version>6.0.2</Version>
 		<Authors>Renato Bortolazzi Junior</Authors>
 		<PackageDescription>Funcionalidades para facilitar execução de operações em MySql com .net core.</PackageDescription>
 		<RepositoryUrl>https://github.com/Bortolazzi/Wanadi</RepositoryUrl>
