@@ -3,7 +3,8 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<Version>6.0.2</Version>
+		<Version>6.0.3</Version>
+		<NoWarn>$(NoWarn);NU1803</NoWarn>
 		<Authors>Renato Bortolazzi Junior</Authors>
 		<PackageDescription>Funcionalidades comuns utilizadas em projetos e no Wanadi.MySql.</PackageDescription>
 		<RepositoryUrl>https://github.com/Bortolazzi/Wanadi</RepositoryUrl>
@@ -15,5 +16,6 @@
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.ProgramSynthesis.Detection" Version="8.31.0" />
+		<PackageReference Include="Microsoft.Extensions.Primitives" Version="8.0.0" />
 	</ItemGroup>
 </Project>

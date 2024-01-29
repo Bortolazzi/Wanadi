@@ -9,6 +9,7 @@ public static class ContextWrapper
     private static string DATABASE = "DATABASE_NAME";
     private static string USER = "USER_MYSQL";
     private static string PASSWORD = "PASSWORD_MYSQL";
+
     public static string ConnectionString => MySqlWrapper.BuildConnectionString(SERVER, DATABASE, USER, PASSWORD);
 
     public static WanadiContext Wanadi()

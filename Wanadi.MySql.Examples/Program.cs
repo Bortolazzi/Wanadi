@@ -52,7 +52,7 @@ async Task TestInsertPerformanceBetweenEFAndDWAsync(int recordsQuantity)
 async Task GenerateTableTestRecordsToTestUsingDataWrapperAsync(int recordsQuantity)
 {
     var sourceInsert = new List<TableTestEntity>();
-
+    
     for (int i = 0; i < recordsQuantity; i++)
     {
         sourceInsert.Add(new TableTestEntity()

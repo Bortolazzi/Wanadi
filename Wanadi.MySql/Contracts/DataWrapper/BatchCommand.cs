@@ -11,7 +11,7 @@ public class BatchCommand
     public BatchCommand(List<InsertCommand> insertCommands, bool disableKeyCheks)
     {
         Count = insertCommands.Count;
-        MySqlCommand = $"{insertCommands.FirstOrDefault().PrefixCommand}{string.Join(",", insertCommands.Select(t => t.SuffixCommand))};";
+        MySqlCommand = $"{insertCommands.FirstOrDefault()?.PrefixCommand}{string.Join(",", insertCommands.Select(t => t.SuffixCommand))};";
 
         if (disableKeyCheks)
             MySqlCommand = $"SET foreign_key_checks = 0; {MySqlCommand} SET foreign_key_checks = 1;";
