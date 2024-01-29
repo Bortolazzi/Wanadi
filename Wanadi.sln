@@ -9,6 +9,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wanadi.MySql", "Wanadi.MySq
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wanadi.MySql.Examples", "Wanadi.MySql.Examples\Wanadi.MySql.Examples.csproj", "{E05C2D5A-89CA-4E01-98CE-A9DD963C1EB8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wanadi.Common.Examples", "Wanadi.Common.Examples\Wanadi.Common.Examples.csproj", "{4BA5A877-898E-4C9B-A8DE-0EA055C3B512}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{3DD0EE9C-0BC2-44F1-BB1E-9A777FED85FC}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +34,10 @@ Global
 		{E05C2D5A-89CA-4E01-98CE-A9DD963C1EB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E05C2D5A-89CA-4E01-98CE-A9DD963C1EB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E05C2D5A-89CA-4E01-98CE-A9DD963C1EB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4BA5A877-898E-4C9B-A8DE-0EA055C3B512}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BA5A877-898E-4C9B-A8DE-0EA055C3B512}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BA5A877-898E-4C9B-A8DE-0EA055C3B512}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4BA5A877-898E-4C9B-A8DE-0EA055C3B512}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

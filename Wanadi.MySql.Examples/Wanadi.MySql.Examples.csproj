@@ -5,6 +5,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <NoWarn>$(NoWarn);NU1803</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,15 +13,5 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MySql.EntityFrameworkCore" Version="8.0.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="Data\" />
-    <None Remove="Data\Entities\" />
-    <None Remove="Enums\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Data\" />
-    <Folder Include="Data\Entities\" />
-    <Folder Include="Enums\" />
   </ItemGroup>
 </Project>

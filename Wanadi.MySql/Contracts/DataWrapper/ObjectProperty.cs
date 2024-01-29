@@ -16,20 +16,21 @@ public class ObjectProperty
 
         if (PropertyType.IsGenericType && PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
         {
-            PropertyType = Nullable.GetUnderlyingType(PropertyType);
+            PropertyType = Nullable.GetUnderlyingType(PropertyType) ?? PropertyType;
             AllowNull = true;
         }
 
-        if (PropertyType.FullName.StartsWith("System.Collection") ||
-            PropertyType.FullName.StartsWith("System.Object") ||
-            !PropertyType.FullName.StartsWith("System"))
+        var fullName = PropertyType.FullName ?? string.Empty;
+        if (fullName.StartsWith("System.Collection") ||
+            fullName.StartsWith("System.Object") ||
+            !fullName.StartsWith("System"))
         {
             IgnoreOnInsert = true;
         }
 
         if (PropertyType == typeof(string))
             AllowNull = true;
-        
+
         var databaseGenerated = propertyInfo.GetAttribute<DatabaseGeneratedAttribute>();
         if (databaseGenerated != null)
             IgnoreOnInsert = true;
@@ -53,7 +54,7 @@ public class ObjectProperty
             AllowNull = false;
 
         var columnAttribute = propertyInfo.GetAttribute<ColumnAttribute>();
-        if (columnAttribute != null)
+        if (columnAttribute != null && !string.IsNullOrEmpty(columnAttribute.Name))
             ColumnName = columnAttribute.Name;
 
         var stringLengthAttribute = propertyInfo.GetAttribute<StringLengthAttribute>();
@@ -170,7 +171,7 @@ public class ObjectProperty
     ///         en-US: Corresponding data type for Mysql.
     ///     </para>
     /// </summary>
-    public string MySqlType { get; set; }
+    public string MySqlType { get; set; } = string.Empty;
 
     /// <summary>
     ///     <para>
@@ -211,7 +212,7 @@ public class ObjectProperty
 
     private void CastTypeToMySql(EnumConditions enumOption, GuidConditions guidOption)
     {
-        if (PropertyType.BaseType?.FullName == "System.Enum")
+        if (IsEnum)
         {
             if (enumOption == EnumConditions.CastToInt)
                 MySqlType = "int";

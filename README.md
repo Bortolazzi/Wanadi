@@ -29,6 +29,7 @@ A ideia é manter o projeto atualizado e crescendo com algumas funcionalidades q
 - [x] Publicar primeira versão dos pacotes
 - [X] Criar summaries no código para facilitar a utilização
 - [X] Adicionar FileHelper (Para leitura e escrita de arquivos)
+- [X] Adicionar RestApiClient (Para integrações com API Rest)
 - [ ] Adicionar CsvHelper (Para ajudar na leitura de arquivos CSV e conversão para objetos tipados)
 
 --------------------------------------------------------------------------------------------------  

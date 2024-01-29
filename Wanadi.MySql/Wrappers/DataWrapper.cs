@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Concurrent;
+using System.Text;
 using Wanadi.Common.Enums;
 using Wanadi.Common.Extensions;
 using Wanadi.Common.Helpers;
@@ -678,6 +679,195 @@ public static class DataWrapper
         groupedTables.Clear();
 
         return response;
+    }
+
+    /// <summary>
+    ///     <para>
+    ///         pt-BR: Gera o script de criação da tabela em MySql baseado em uma coleção de dados dinâmica.
+    ///     </para>
+    ///     <para>
+    ///         en-US: Generates the table creation script in MySql based on a dynamic data collection.
+    ///     </para>
+    /// </summary>
+    /// <param name="sourceItems">
+    ///     <para>
+    ///         pt-BR: Lista base para captura das propriedades e transformar em colunas.
+    ///     </para>
+    ///     <para>
+    ///         en-US: Base list to capture properties and transform into columns.
+    ///     </para>
+    /// </param>
+    /// <param name="fieldsIgnore">
+    ///     <para>
+    ///         pt-BR: Opcional. O nome das propriedades informados, serão removidos do insert. (Ex: Campos Id que não possuam a DatabaseGeneratedAttribute devem ser informados aqui)
+    ///     </para>
+    ///     <para>
+    ///         en-US: Optional. The name of the properties entered will be removed from the insert. (Ex: Id fields that do not have the DatabaseGeneratedAttribute must be entered here)
+    ///     </para>
+    /// </param>
+    /// <returns>
+    ///     <para>
+    ///         pt-BR: Script de criação da tabela baseado em uma listagem.
+    ///     </para>
+    ///     <para>
+    ///         en-US: Table creation script based on a listing.
+    ///     </para>
+    /// </returns>
+    /// <exception cref="ArgumentNullException">
+    ///     <para>
+    ///         pt-BR: Nome da tabela não pode ser branco/nulo.
+    ///     </para
+    ///     <para>
+    ///         en-US: Table name cannot be empty/null.
+    ///     </para>
+    /// </exception>
+    public static string? GenerateCreateTableScriptFromIList(IList sourceItems, params string[] fieldsIgnore)
+    {
+        if (sourceItems == null || sourceItems.Count == 0)
+            return null;
+
+        var tableName = sourceItems.GetTableName();
+        if (string.IsNullOrEmpty(tableName))
+            throw new ArgumentNullException("tableName");
+
+        return GenerateCreateTableScriptFromIList(tableName, sourceItems, fieldsIgnore);
+    }
+
+    /// <summary>
+    ///     <para>
+    ///         pt-BR: Gera o script de criação da tabela em MySql baseado em uma coleção de dados dinâmica.
+    ///     </para>
+    ///     <para>
+    ///         en-US: Generates the table creation script in MySql based on a dynamic data collection.
+    ///     </para>
+    /// </summary>
+    /// <param name="tableName">
+    ///     <para>
+    ///         pt-BR: Nome da tabela a ser utilizada para criação.
+    ///     </para>
+    ///     <para>
+    ///         en-US: Name of the table to be used for creation.
+    ///     </para>
+    /// </param>
+    /// <param name="sourceItems">
+    ///     <para>
+    ///         pt-BR: Lista base para captura das propriedades e transformar em colunas.
+    ///     </para>
+    ///     <para>
+    ///         en-US: Base list to capture properties and transform into columns.
+    ///     </para>
+    /// </param>
+    /// <param name="fieldsIgnore">
+    ///     <para>
+    ///         pt-BR: Opcional. O nome das propriedades informados, serão removidos do insert. (Ex: Campos Id que não possuam a DatabaseGeneratedAttribute devem ser informados aqui)
+    ///     </para>
+    ///     <para>
+    ///         en-US: Optional. The name of the properties entered will be removed from the insert. (Ex: Id fields that do not have the DatabaseGeneratedAttribute must be entered here)
+    ///     </para>
+    /// </param>
+    /// <returns>
+    ///     <para>
+    ///         pt-BR: Script de criação da tabela baseado em uma listagem.
+    ///     </para>
+    ///     <para>
+    ///         en-US: Table creation script based on a listing.
+    ///     </para>
+    /// </returns>
+    /// <exception cref="ArgumentNullException">
+    ///     <para>
+    ///         pt-BR: Nome da tabela não pode ser branco/nulo.
+    ///     </para
+    ///     <para>
+    ///         en-US: Table name cannot be empty/null.
+    ///     </para>
+    /// </exception>
+    public static string? GenerateCreateTableScriptFromIList(string tableName, IList sourceItems, params string[] fieldsIgnore)
+    {
+        if (string.IsNullOrEmpty(tableName))
+            throw new ArgumentNullException("tableName");
+
+        if (sourceItems == null || sourceItems.Count == 0)
+            return null;
+
+        var properties = GetObjectPropertiesByType(sourceItems.GetType().GetGenericArguments()[0], fieldsIgnore);
+
+        var createScript = new StringBuilder();
+
+        try
+        {
+            createScript.AppendLine($"CREATE TABLE `{tableName}` (");
+            createScript.AppendLine($"`DwId` int NOT NULL AUTO_INCREMENT,");
+
+            foreach (var propertInfo in properties)
+            {
+                var nullIndicator = propertInfo.AllowNull ? " DEFAULT " : " NOT ";
+
+                if (propertInfo.IsEnum)
+                {
+                    if (EnumOption == EnumConditions.CastToString)
+                        createScript.AppendLine($"  `{propertInfo.ColumnName}` VARCHAR(255) {nullIndicator}NULL,");
+                    else if (EnumOption == EnumConditions.CastToInt)
+                        createScript.AppendLine($"  `{propertInfo.ColumnName}` INT {nullIndicator}NULL,");
+
+                    continue;
+                }
+
+                if (propertInfo.PropertyType == typeof(Guid))
+                {
+                    if (GuidOption == GuidConditions.CastToString)
+                        createScript.AppendLine($"  `{propertInfo.ColumnName}` VARCHAR(36) {nullIndicator}NULL,");
+
+                    continue;
+                }
+
+                if (propertInfo.MySqlType == "varchar")
+                {
+                    if (propertInfo.MaximumLength.GetValueOrDefault(0) > 2000)
+                        createScript.AppendLine($"  `{propertInfo.ColumnName}` TEXT {nullIndicator}NULL,");
+                    else if (propertInfo.MaximumLength.GetValueOrDefault(0) > 0)
+                        createScript.AppendLine($"  `{propertInfo.ColumnName}` VARCHAR({propertInfo.MaximumLength.GetValueOrDefault(0)}) {nullIndicator}NULL,");
+                    else
+                        createScript.AppendLine($"  `{propertInfo.ColumnName}` VARCHAR(255) {nullIndicator}NULL,");
+
+                    continue;
+                }
+
+                if (propertInfo.MySqlType == "char")
+                {
+                    if (propertInfo.MaximumLength.GetValueOrDefault(0) > 2000)
+                        createScript.AppendLine($"  `{propertInfo.ColumnName}` TEXT {nullIndicator}NULL,");
+                    else if (propertInfo.MaximumLength.GetValueOrDefault(0) > 0)
+                        createScript.AppendLine($"  `{propertInfo.ColumnName}` CHAR({propertInfo.MaximumLength.GetValueOrDefault(0)}) {nullIndicator}NULL,");
+                    else
+                        createScript.AppendLine($"  `{propertInfo.ColumnName}` CHAR(255) {nullIndicator}NULL,");
+
+                    continue;
+                }
+
+                if (propertInfo.MySqlType == "decimal")
+                {
+                    if (propertInfo.Precision.GetValueOrDefault(0) > 0)
+                        createScript.AppendLine($"  `{propertInfo.ColumnName}` DECIMAL({propertInfo.Precision.GetValueOrDefault(0)}, {propertInfo.Scale.GetValueOrDefault(0)}) {nullIndicator}NULL,");
+                    else
+                        createScript.AppendLine($"  `{propertInfo.ColumnName}` DECIMAL(18,2) {nullIndicator}NULL,");
+
+                    continue;
+                }
+
+                createScript.AppendLine($"  `{propertInfo.ColumnName}` {propertInfo.MySqlType} {nullIndicator}NULL,");
+                continue;
+            }
+
+            createScript.AppendLine($"PRIMARY KEY (`DwId`),");
+            createScript.AppendLine($"UNIQUE KEY `DwId_UNIQUE` (`DwId`)");
+            createScript.AppendLine(");");
+
+            return createScript.ToString();
+        }
+        finally
+        {
+            createScript.Clear();
+        }
     }
 
     private static List<ObjectProperty> GetObjectPropertiesByType(Type objectType, params string[] fieldsIgnore)
