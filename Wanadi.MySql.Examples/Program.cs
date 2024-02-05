@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
+using Microsoft.EntityFrameworkCore;
 using Wanadi.Common.Extensions;
 using Wanadi.MySql.Examples;
 using Wanadi.MySql.Examples.Data;
@@ -104,7 +105,7 @@ async Task GenerateTableTestRecordsToTestUsingEFAsync(int recordsQuantity)
     }
 
     var context = ContextWrapper.Wanadi();
-
+    var teste = context.TableTests.ToListAsync();
     await context.AddRangeAsync(sourceInsert);
     await context.SaveChangesAsync();
 }
