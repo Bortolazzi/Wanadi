@@ -67,4 +67,30 @@ public static class StringExtensions
         }
         return sbReturn.ToString();
     }
+
+    public static string RemoveLeftZeros(this string text)
+    {
+        while (text.Trim().StartsWith("0"))
+            text = text.Trim().Substring(1);
+
+        return text;
+    }
+
+    public static string RemoveDoubleSpaces(this string text)
+    {
+        var value = (text ?? string.Empty);
+
+        while (value.Contains("  "))
+            value = value.Replace("  ", " ");
+
+        return value;
+    }
+
+    public static string ClearEmptyCharacters(this string text)
+    {
+        text = (text ?? string.Empty).Replace("\n", " ")
+                                     .Replace("\t", " ");
+
+        return text.RemoveDoubleSpaces();
+    }
 }
