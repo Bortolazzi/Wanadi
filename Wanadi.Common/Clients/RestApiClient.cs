@@ -64,6 +64,7 @@ public class RestApiClient
 
     private Uri? BaseUri { get; set; }
     private CookieContainer? ContainerCookie { get; set; }
+    private WebProxy? Proxy { get; set; }
 
     public RestApiClient() : this(Encoding.UTF8) { }
 
@@ -112,6 +113,16 @@ public class RestApiClient
 
         BaseUri = tryCreate;
     }
+
+    protected void SetWebProxy(string ipAddress, int port, string user, string password)
+    {
+        var proxy = new WebProxy($"{ipAddress}:{port}");
+        proxy.Credentials = new NetworkCredential(user, password);
+        SetWebProxy(proxy);
+    }
+
+    protected void SetWebProxy(WebProxy proxy)
+        => Proxy = proxy;
 
     #region [GET]
 
@@ -946,6 +957,9 @@ public class RestApiClient
 
         if (AllowByPassCertificateCheck)
             httpClientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+
+        if (Proxy != null)
+            httpClientHandler.Proxy = Proxy;
 
         return new HttpClient(httpClientHandler);
     }

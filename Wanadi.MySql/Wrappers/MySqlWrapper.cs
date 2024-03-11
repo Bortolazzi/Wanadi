@@ -2,6 +2,7 @@
 using System.Data;
 using MySql.Data.MySqlClient;
 using Wanadi.Common.Extensions;
+using Wanadi.MySql.Contracts.DataWrapper;
 
 namespace Wanadi.MySql.Wrappers;
 
@@ -1137,6 +1138,33 @@ public static class MySqlWrapper
                 return response;
             }
         }
+    }
+
+    public static async Task<int> ExecuteBatchesCommandAsync(string connectionString, List<BatchCommand> batches)
+    {
+        int response = 0;
+        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        {
+            await connection.OpenAsync();
+
+            int batchCounter = 0;
+            foreach (var batch in batches)
+            {
+                batchCounter++;
+                $"Running batch command {batchCounter:N0} of {batches.Count:N0}".PrintInfo();
+                using (MySqlCommand command = new MySqlCommand(batch.MySqlCommand, connection))
+                {
+                    command.CommandType = CommandType.Text;
+
+                    if (ForceMaxConnectionTimeout)
+                        command.CommandTimeout = 0;
+
+                    response += await command.ExecuteNonQueryAsync();
+                }
+            }
+        }
+
+        return response;
     }
 
     public static T ConvertDataReaderToClass<T>(MySqlDataReader reader, List<string> resultFields) where T : class

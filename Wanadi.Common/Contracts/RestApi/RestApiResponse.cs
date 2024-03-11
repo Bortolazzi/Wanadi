@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
-using Wanadi.Common.Extensions;
 
 namespace Wanadi.Common.Contracts.RestApi;
 
