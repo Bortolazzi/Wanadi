@@ -95,8 +95,11 @@ public static class MySqlWrapper
                IncludeSecurityAsserts = true,
                MaximumPoolSize = 5000,
                DefaultCommandTimeout = commandTimeout,
-               ConnectionTimeout = commandTimeout
+               ConnectionTimeout = commandTimeout,
+               AllowLoadLocalInfile = true
            }.ConnectionString;
+
+    #region [SelectQuery]
 
     /// <summary>
     ///     <para>
@@ -687,6 +690,10 @@ public static class MySqlWrapper
         return null;
     }
 
+    #endregion [SelectQuery]
+
+    #region [ExecuteNonQuery]
+
     /// <summary>
     ///     <para>
     ///         pt-BR: Realiza a execução de uma query e retorna a quantidade de registros afetados.
@@ -836,6 +843,10 @@ public static class MySqlWrapper
         }
     }
 
+    #endregion [ExecuteNonQuery]
+
+    #region [ExecuteScalar]
+
     /// <summary>
     ///     <para>
     ///         pt-BR: Realiza a execução de uma query e retorna a primeira coluna da primeira linha como um objeto
@@ -983,6 +994,10 @@ public static class MySqlWrapper
             return await command.ExecuteScalarAsync();
         }
     }
+
+    #endregion [ExecuteScalar]
+
+    #region [Fill]
 
     /// <summary>
     ///     <para>
@@ -1140,6 +1155,8 @@ public static class MySqlWrapper
         }
     }
 
+    #endregion [Fill]
+
     public static async Task<int> ExecuteBatchesCommandAsync(string connectionString, List<BatchCommand> batches)
     {
         int response = 0;
@@ -1167,6 +1184,44 @@ public static class MySqlWrapper
         return response;
     }
 
+    public static async Task ExecuteBulkInsertAsync<TType>(string connectionString, List<TType> source, params string[] fieldsIgnore) where TType : class
+    {
+        if (source == null || source.Count == 0)
+            return;
+
+        var tableName = source.GetTableName();
+        if (string.IsNullOrEmpty(tableName))
+            throw new Exception("Unable to identify table name or object name.");
+
+        var dataSource = DataWrapper.CastListToDataTableBulkInsert(source, fieldsIgnore);
+        if (dataSource == null)
+            return;
+
+        //SHOW GLOBAL VARIABLES LIKE 'local_infile';
+        //SET GLOBAL local_infile = 1; to enable bulk insert
+
+        using (var connection = new MySqlConnector.MySqlConnection(connectionString))
+        {
+            await connection.OpenAsync();
+            var bulkCopy = new MySqlConnector.MySqlBulkCopy(connection);
+            bulkCopy.DestinationTableName = tableName;
+            bulkCopy.ColumnMappings.AddRange(GetMySqlColumnMapping(dataSource));
+            await bulkCopy.WriteToServerAsync(dataSource);
+        }
+    }
+
+    private static List<MySqlConnector.MySqlBulkCopyColumnMapping> GetMySqlColumnMapping(DataTable dataTable)
+    {
+        var response = new List<MySqlConnector.MySqlBulkCopyColumnMapping>();
+
+        for (int i = 0; i < dataTable.Columns.Count; i++)
+        {
+            response.Add(new MySqlConnector.MySqlBulkCopyColumnMapping(i, dataTable.Columns[i].ColumnName));
+        }
+
+        return response;
+    }
+
     public static T ConvertDataReaderToClass<T>(MySqlDataReader reader, List<string> resultFields) where T : class
     {
         T response = Activator.CreateInstance<T>();
@@ -1181,7 +1236,7 @@ public static class MySqlWrapper
                 continue;
 
             object value = reader[columnName];
-
+            
             if (value == DBNull.Value || value == null)
                 continue;
 

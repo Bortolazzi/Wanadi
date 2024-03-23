@@ -1,6 +1,8 @@
 ﻿using System.Data;
 using ClickHouse.Ado;
+using ClickHouse.Client.Copy;
 using Wanadi.Clickhouse.Contracts;
+using Wanadi.Clickhouse.Extensions;
 using Wanadi.Common.Extensions;
 using Wanadi.Common.Helpers;
 
@@ -180,6 +182,8 @@ public static class ClickHouseWrapper
 
     #endregion [SelectQueryFirstOrDefault]
 
+    #region [Batch Insert]
+
     public static async Task BatchInsertAsync<TType>(ClickHouseConnection connection, List<TType> sourceItems, int batchQuantity = 100000) where TType : class
     {
         if (sourceItems == null || sourceItems.Count == 0)
@@ -206,7 +210,7 @@ public static class ClickHouseWrapper
 
         for (int i = 0; i < iterations; i++)
         {
-            $"Running batch command {(i+1):N0} of {iterations:N0}".PrintInfo();
+            $"Running batch command {(i + 1):N0} of {iterations:N0}".PrintInfo();
 
             var sourceBatch = sourceItems.Skip(i * batchQuantity).Take(batchQuantity).ToList();
 
@@ -224,12 +228,97 @@ public static class ClickHouseWrapper
         }
     }
 
+    #endregion [Batch Insert]
+
+    #region [Bulk Insert]
+
+    public static async Task BulkInsertAsync<TType>(ClickHouseConnectionSettings settings, List<TType> sourceItems, bool isHttps = false) where TType : class
+    {
+        if (sourceItems == null || sourceItems.Count == 0)
+            return;
+
+        var tableName = sourceItems.GetTableName();
+        if (string.IsNullOrEmpty(tableName))
+            throw new Exception("Unable to identify table name or object name.");
+
+        await BulkInsertAsync<TType>(settings, tableName, sourceItems, isHttps);
+    }
+
+    public static async Task BulkInsertAsync<TType>(ClickHouseConnectionSettings settings, string tableName, List<TType> sourceItems, bool isHttps = false) where TType : class
+    {
+        if (sourceItems == null || sourceItems.Count == 0)
+            return;
+
+        if (string.IsNullOrEmpty(tableName))
+            throw new Exception("Unable to identify table name or object name.");
+
+        var defaultPort = settings.Port;
+
+        try
+        {
+            settings.Port = isHttps ? 8443 : 8123;
+
+            var propertiesToInsert = GetPropertiesToInsert(typeof(TType));
+            //var values = ConvertListToBulkInsert(sourceItems, propertiesToInsert);
+
+            using var bulkCopy = new ClickHouseBulkCopy(new ClickHouse.Client.ADO.ClickHouseConnection(settings.ToString()))
+            {
+                DestinationTableName = $"{settings.Database}.{tableName}",
+                ColumnNames = propertiesToInsert.Select(t => t.ColumnName).ToArray(), 
+                BatchSize = 100000
+            };
+
+            await bulkCopy.InitAsync();
+            
+            await bulkCopy.WriteToServerAsync(sourceItems.ToDataTable(propertiesToInsert), CancellationToken.None);
+        }
+        finally
+        {
+            settings.Port = defaultPort;
+        }
+    }
+
+    #endregion [Bulk Insert]
+
+    private static IEnumerable<object[]> ConvertListToBulkInsert<TType>(List<TType> sourceItems, List<PropertyDataWrapper> properties) where TType : class
+    {
+        var response = new List<object[]>();
+
+        foreach (var item in sourceItems)
+        {
+            var propertyValues = new List<object>();
+
+            foreach (var prop in properties)
+            {
+                var value = prop.OriginalPropertyInfo.GetValue(item);
+
+                if (prop.PropertyType == typeof(Int32))
+                {
+                    propertyValues.Add(Convert.ChangeType(value, typeof(long)));
+                    continue;
+                }
+
+                propertyValues.Add(value);
+            }
+
+            response.Add(propertyValues.ToArray());
+            propertyValues.Clear();
+        }
+
+        return response;
+    }
+
     private static string GetBatchInsertCommandPrefix(Type objectType, string tableName)
     {
-        var properties = objectType.GetProperties().Select(t => new PropertyDataWrapper(t)).ToList();
-        properties = properties.Where(t => !t.IgnoreOnInsert).OrderBy(t => t.ColumnName).ToList();
+        var properties = GetPropertiesToInsert(objectType);
 
         return $"INSERT INTO {tableName} ({string.Join(", ", properties.Select(t => t.ColumnName).ToList())}) VALUES @batch";
+    }
+
+    private static List<PropertyDataWrapper> GetPropertiesToInsert(Type objectType)
+    {
+        var properties = objectType.GetProperties().Select(t => new PropertyDataWrapper(t)).ToList();
+        return properties.Where(t => !t.IgnoreOnInsert).OrderBy(t => t.ColumnName).ToList();
     }
 
     private static List<ClickHouseColumnsResultDataType> GetResultFields<TType>(ClickHouseDataReader dataReader) where TType : class

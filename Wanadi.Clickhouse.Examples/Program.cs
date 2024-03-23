@@ -1,5 +1,5 @@
-﻿using System.Globalization;
-using ClickHouse.Ado;
+﻿using System.Diagnostics;
+using System.Globalization;
 using Wanadi.Clickhouse.Examples;
 using Wanadi.Clickhouse.Wrappers;
 using Wanadi.Common.Extensions;
@@ -9,6 +9,7 @@ CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("pt-BR");
 
 var settings = ClickHouseWrapper.BuildConnectionSettings("192.168.60.35", "wanadi", "default", null, socketTimeout: 0);
 
+await BulkInsertTestAsync();
 await BatchInsertTestAsync();
 
 Console.ReadKey();
@@ -24,39 +25,52 @@ async Task BatchInsertTestAsync()
 
         using (var connection = await ClickHouseWrapper.GetConnectionAsync(settings))
         {
-            var start = DateTime.Now;
+            var sw = new Stopwatch();
 
-            await ExecuteBatchInsertAsync(connection, source1000);
+            sw.Start();
 
-            $"Time elapsed to insert 1000 rows {DateTime.Now.Subtract(start)}".PrintInfo();
-            start = DateTime.Now;
+            await ClickHouseWrapper.BatchInsertAsync(connection, source1000);
 
-            await ExecuteBatchInsertAsync(connection, source10000);
+            sw.Stop();
 
-            $"Time elapsed to insert 10000 rows {DateTime.Now.Subtract(start)}".PrintInfo();
-            start = DateTime.Now;
+            $"1.000 rows insert elapsed in {sw.Elapsed}".PrintInfo();
+            sw.Reset();
+            sw.Start();
 
-            await ExecuteBatchInsertAsync(connection, source100000);
+            await ClickHouseWrapper.BatchInsertAsync(connection, source10000);
 
-            $"Time elapsed to insert 100000 rows {DateTime.Now.Subtract(start)}".PrintInfo();
-            start = DateTime.Now;
+            sw.Stop();
 
-            await ExecuteBatchInsertAsync(connection, source1000000);
+            $"10.000 rows insert elapsed in {sw.Elapsed}".PrintInfo();
+            sw.Reset();
+            sw.Start();
 
-            $"Time elapsed to insert 1000000 rows {DateTime.Now.Subtract(start)}".PrintInfo();
+            await ClickHouseWrapper.BatchInsertAsync(connection, source100000);
+
+            sw.Stop();
+
+            $"100.000 rows insert elapsed in {sw.Elapsed}".PrintInfo();
+            sw.Reset();
+            sw.Start();
+
+            await ClickHouseWrapper.BatchInsertAsync(connection, source1000000);
+
+            sw.Stop();
+
+            $"1.000.000 rows insert elapsed in {sw.Elapsed}".PrintInfo();
         }
 
-        //ClickHouse - Time elapsed to insert 1000 rows 00:00:00.9968200
-        //MySqlServer -  Time elapsed to insert 1000 rows 00:00:03.1916450
+        //ClickHouse  - Batch -     1.000 rows insert elapsed in 00:00:00.9968200
+        //MySqlServer - Batch -     1.000 rows insert elapsed in 00:00:03.1916450
 
-        //ClickHouse - Time elapsed to insert 10000 rows 00:00:02.8870980
-        //MySqlServer - Time elapsed to insert 10000 rows 00:00:03.2677990
+        //ClickHouse  - Batch -    10.000 rows insert elapsed in 00:00:02.8870980
+        //MySqlServer - Batch -    10.000 rows insert elapsed in 00:00:03.2677990
 
-        //ClickHouse - Time elapsed to insert 100000 rows 00:00:19.1549280
-        //MySqlServer - Time elapsed to insert 100000 rows 00:00:16.8131860
+        //ClickHouse  - Batch -   100.000 rows insert elapsed in 00:00:19.1549280
+        //MySqlServer - Batch -   100.000 rows insert elapsed in 00:00:16.8131860
 
-        //ClickHouse - Time elapsed to insert 1000000 rows 00:03:04.5414290
-        //MySqlServer - Time elapsed to insert 1000000 rows 00:02:44.6377380
+        //ClickHouse  - Batch - 1.000.000 rows insert elapsed in 00:03:04.5414290
+        //MySqlServer - Batch - 1.000.000 rows insert elapsed in 00:02:44.6377380
     }
     catch (Exception ex)
     {
@@ -64,9 +78,73 @@ async Task BatchInsertTestAsync()
     }
 }
 
-async Task ExecuteBatchInsertAsync(ClickHouseConnection connection, List<TableTestEntity> sourceItems)
+async Task BulkInsertTestAsync()
 {
-    await ClickHouseWrapper.BatchInsertAsync(connection, sourceItems);
+    try
+    {
+        var source1000 = GenerateDataToInsert(1000);
+        var source10000 = GenerateDataToInsert(10000);
+        var source100000 = GenerateDataToInsert(100000);
+        var source1000000 = GenerateDataToInsert(1000000);
+
+        var sw = new Stopwatch();
+
+        sw.Start();
+
+        await ClickHouseWrapper.BulkInsertAsync(settings, source1000);
+
+        sw.Stop();
+
+        $"1.000 rows insert elapsed in {sw.Elapsed}".PrintInfo();
+        sw.Reset();
+        sw.Start();
+
+        await ClickHouseWrapper.BulkInsertAsync(settings, source10000);
+
+        sw.Stop();
+
+        $"10.000 rows insert elapsed in {sw.Elapsed}".PrintInfo();
+        sw.Reset();
+        sw.Start();
+
+        await ClickHouseWrapper.BulkInsertAsync(settings, source100000);
+
+        sw.Stop();
+
+        $"100.000 rows insert elapsed in {sw.Elapsed}".PrintInfo();
+        sw.Reset();
+        sw.Start();
+
+        await ClickHouseWrapper.BulkInsertAsync(settings, source1000000);
+
+        sw.Stop();
+
+        $"1.000.000 rows insert elapsed in {sw.Elapsed}".PrintInfo();
+
+        //ClickHouse  - Batch -     1.000 rows insert elapsed in 00:00:00.9968200
+        //MySqlServer - Batch -     1.000 rows insert elapsed in 00:00:03.1916450
+
+        //MySqlServer -  Bulk -     1.000 rows insert elapsed in 00:00:02.1574839
+
+        //ClickHouse  - Batch -    10.000 rows insert elapsed in 00:00:02.8870980
+        //MySqlServer - Batch -    10.000 rows insert elapsed in 00:00:03.2677990
+
+        //MySqlServer -  Bulk -    10.000 rows insert elapsed in 00:00:02.7510941
+
+        //ClickHouse  - Batch -   100.000 rows insert elapsed in 00:00:19.1549280
+        //MySqlServer - Batch -   100.000 rows insert elapsed in 00:00:16.8131860
+
+        //MySqlServer -  Bulk -   100.000 rows insert elapsed in 00:00:11.2027401
+
+        //ClickHouse  - Batch - 1.000.000 rows insert elapsed in 00:03:04.5414290
+        //MySqlServer - Batch - 1.000.000 rows insert elapsed in 00:02:44.6377380
+
+        //MySqlServer -  Bulk - 1.000.000 rows insert elapsed in 00:01:38.3122330
+    }
+    catch (Exception ex)
+    {
+        ex.Message.PrintError(ex);
+    }
 }
 
 List<TableTestEntity> GenerateDataToInsert(int quantity)

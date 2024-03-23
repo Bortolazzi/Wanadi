@@ -11,6 +11,8 @@ public class ObjectProperty
 {
     public ObjectProperty(PropertyInfo propertyInfo, EnumConditions enumOption, GuidConditions guidOption)
     {
+        OriginalPropertyInfo = propertyInfo;
+
         Name = propertyInfo.Name;
         PropertyType = propertyInfo.PropertyType;
 
@@ -77,6 +79,8 @@ public class ObjectProperty
 
         CastTypeToMySql(enumOption, guidOption);
     }
+
+    public PropertyInfo OriginalPropertyInfo { get; set; }
 
     /// <summary>
     ///     <para>

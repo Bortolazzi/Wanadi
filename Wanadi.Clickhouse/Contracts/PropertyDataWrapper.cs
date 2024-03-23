@@ -18,6 +18,14 @@ public class PropertyDataWrapper
         var databaseGeneratedAttribute = property.GetAttribute<DatabaseGeneratedAttribute>();
         if (databaseGeneratedAttribute != null)
             IgnoreOnInsert = true;
+
+        PropertyType = property.PropertyType;
+
+        if (PropertyType.IsGenericType && PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+        {
+            PropertyType = Nullable.GetUnderlyingType(PropertyType) ?? PropertyType;
+            AllowNull = true;
+        }
     }
 
     public PropertyInfo OriginalPropertyInfo { get; set; }
@@ -29,5 +37,7 @@ public class PropertyDataWrapper
     }
     private string? _columnName;
 
+    public Type PropertyType { get; set; }
+    public bool AllowNull { get; set; } = false;
     public bool IgnoreOnInsert { get; set; } = false;
 }
