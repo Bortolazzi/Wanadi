@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<NoWarn>$(NoWarn);NU1803</NoWarn>
+		<Version>8.0.0</Version>
+		<Authors>Renato Bortolazzi Junior</Authors>
+		<PackageDescription>Funcionalidades para facilitar execução de operações em Clickhouse com .net core.</PackageDescription>
+		<RepositoryUrl>https://github.com/Bortolazzi/Wanadi</RepositoryUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Include="../README.md" Pack="true" PackagePath="/" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Wanadi.Common\Wanadi.Common.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="ClickHouse.Ado" Version="2.0.3" />
+	</ItemGroup>
+</Project>
