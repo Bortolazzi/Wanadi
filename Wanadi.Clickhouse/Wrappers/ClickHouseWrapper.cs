@@ -2,7 +2,6 @@
 using ClickHouse.Ado;
 using ClickHouse.Client.Copy;
 using Wanadi.Clickhouse.Contracts;
-using Wanadi.Clickhouse.Extensions;
 using Wanadi.Common.Extensions;
 using Wanadi.Common.Helpers;
 
@@ -259,7 +258,7 @@ public static class ClickHouseWrapper
             settings.Port = isHttps ? 8443 : 8123;
 
             var propertiesToInsert = GetPropertiesToInsert(typeof(TType));
-            //var values = ConvertListToBulkInsert(sourceItems, propertiesToInsert);
+            var values = ConvertListToBulkInsert(sourceItems, propertiesToInsert);
 
             using var bulkCopy = new ClickHouseBulkCopy(new ClickHouse.Client.ADO.ClickHouseConnection(settings.ToString()))
             {
@@ -270,7 +269,7 @@ public static class ClickHouseWrapper
 
             await bulkCopy.InitAsync();
             
-            await bulkCopy.WriteToServerAsync(sourceItems.ToDataTable(propertiesToInsert), CancellationToken.None);
+            await bulkCopy.WriteToServerAsync(values);
         }
         finally
         {

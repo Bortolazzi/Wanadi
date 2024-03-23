@@ -124,21 +124,25 @@ async Task BulkInsertTestAsync()
         //ClickHouse  - Batch -     1.000 rows insert elapsed in 00:00:00.9968200
         //MySqlServer - Batch -     1.000 rows insert elapsed in 00:00:03.1916450
 
+        //ClickHouse  -  Bulk -     1.000 rows insert elapsed in 00:00:01.3134535
         //MySqlServer -  Bulk -     1.000 rows insert elapsed in 00:00:02.1574839
 
         //ClickHouse  - Batch -    10.000 rows insert elapsed in 00:00:02.8870980
         //MySqlServer - Batch -    10.000 rows insert elapsed in 00:00:03.2677990
 
+        //ClickHouse  -  Bulk -    10.000 rows insert elapsed in 00:00:01.3680546
         //MySqlServer -  Bulk -    10.000 rows insert elapsed in 00:00:02.7510941
 
         //ClickHouse  - Batch -   100.000 rows insert elapsed in 00:00:19.1549280
         //MySqlServer - Batch -   100.000 rows insert elapsed in 00:00:16.8131860
 
+        //ClickHouse  -  Bulk -   100.000 rows insert elapsed in 00:00:08.9147645
         //MySqlServer -  Bulk -   100.000 rows insert elapsed in 00:00:11.2027401
 
         //ClickHouse  - Batch - 1.000.000 rows insert elapsed in 00:03:04.5414290
         //MySqlServer - Batch - 1.000.000 rows insert elapsed in 00:02:44.6377380
 
+        //ClickHouse  -  Bulk - 1.000.000 rows insert elapsed in 00:00:24.4038803
         //MySqlServer -  Bulk - 1.000.000 rows insert elapsed in 00:01:38.3122330
     }
     catch (Exception ex)
@@ -155,11 +159,15 @@ List<TableTestEntity> GenerateDataToInsert(int quantity)
 
     for (int i = 0; i < quantity; i++)
     {
+        birthDate = birthDate.AddDays(i);
+        if (birthDate >= DateTime.Now)
+            birthDate = new DateTime(1992, 10, 28);
+
         response.Add(new TableTestEntity()
         {
             Id = Guid.NewGuid(),
             Name = $"test {i}",
-            BirthDate = (i % 2) == 0 ? birthDate.AddDays(i) : null,
+            BirthDate = (i % 2) == 0 ? birthDate : null,
             Age = i,
             IsActive = true,
             Wage = decimal.Round(1.12m * i, 2, MidpointRounding.AwayFromZero),
