@@ -28,6 +28,8 @@ public static class ClickHouseWrapper
         settings.SocketTimeout = socketTimeout;
         settings.CheckCompressedHash = false;
         settings.Encrypt = false;
+        settings.Async = true;
+
         return settings;
     }
 
@@ -240,7 +242,7 @@ public static class ClickHouseWrapper
         if (string.IsNullOrEmpty(tableName))
             throw new Exception("Unable to identify table name or object name.");
 
-        await BulkInsertAsync<TType>(settings, tableName, sourceItems, isHttps);
+        await BulkInsertAsync(settings, tableName, sourceItems, isHttps);
     }
 
     public static async Task BulkInsertAsync<TType>(ClickHouseConnectionSettings settings, string tableName, List<TType> sourceItems, bool isHttps = false) where TType : class
@@ -251,30 +253,34 @@ public static class ClickHouseWrapper
         if (string.IsNullOrEmpty(tableName))
             throw new Exception("Unable to identify table name or object name.");
 
-        var defaultPort = settings.Port;
+        var propertiesToInsert = GetPropertiesToInsert(typeof(TType));
+        var values = ConvertListToBulkInsert(sourceItems, propertiesToInsert);
 
-        try
+        var connectionString = new ClickHouse.Client.ADO.ClickHouseConnectionStringBuilder();
+        connectionString.Host = settings.Host;
+        connectionString.Database = settings.Database;
+        connectionString.Username = settings.User;
+        connectionString.Port = isHttps ? (ushort)8443 : (ushort)8123;
+        connectionString.Timeout = TimeSpan.FromMinutes(30);
+        
+        if (settings.Password is not null)
+            connectionString.Password = settings.Password;
+
+        connectionString.Compression = true;
+        connectionString.UseServerTimezone = true;
+        
+        var connection = new ClickHouse.Client.ADO.ClickHouseConnection(connectionString.ToString());
+
+        using var bulkCopy = new ClickHouseBulkCopy(connection)
         {
-            settings.Port = isHttps ? 8443 : 8123;
+            DestinationTableName = $"{settings.Database}.{tableName}",
+            ColumnNames = propertiesToInsert.Select(t => t.ColumnName).ToArray(),
+            BatchSize = 100000
+        };
 
-            var propertiesToInsert = GetPropertiesToInsert(typeof(TType));
-            var values = ConvertListToBulkInsert(sourceItems, propertiesToInsert);
+        await bulkCopy.InitAsync();
 
-            using var bulkCopy = new ClickHouseBulkCopy(new ClickHouse.Client.ADO.ClickHouseConnection(settings.ToString()))
-            {
-                DestinationTableName = $"{settings.Database}.{tableName}",
-                ColumnNames = propertiesToInsert.Select(t => t.ColumnName).ToArray(), 
-                BatchSize = 100000
-            };
-
-            await bulkCopy.InitAsync();
-            
-            await bulkCopy.WriteToServerAsync(values);
-        }
-        finally
-        {
-            settings.Port = defaultPort;
-        }
+        await bulkCopy.WriteToServerAsync(values);
     }
 
     #endregion [Bulk Insert]
@@ -289,15 +295,7 @@ public static class ClickHouseWrapper
 
             foreach (var prop in properties)
             {
-                var value = prop.OriginalPropertyInfo.GetValue(item);
-
-                if (prop.PropertyType == typeof(Int32))
-                {
-                    propertyValues.Add(Convert.ChangeType(value, typeof(long)));
-                    continue;
-                }
-
-                propertyValues.Add(value);
+                propertyValues.Add(prop.OriginalPropertyInfo.GetValue(item));
             }
 
             response.Add(propertyValues.ToArray());
