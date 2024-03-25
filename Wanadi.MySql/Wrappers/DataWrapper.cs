@@ -6,7 +6,6 @@ using Wanadi.Common.Enums;
 using Wanadi.Common.Extensions;
 using Wanadi.Common.Helpers;
 using Wanadi.MySql.Contracts.DataWrapper;
-using static Microsoft.ProgramSynthesis.Diagnostics.Location;
 
 namespace Wanadi.MySql.Wrappers;
 

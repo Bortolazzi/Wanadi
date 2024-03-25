@@ -9,6 +9,8 @@ CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("pt-BR");
 
 var settings = ClickHouseWrapper.BuildConnectionSettings("192.168.60.35", "wanadi", "default", null, socketTimeout: 0);
 
+var repository = new TableTestRepository(settings);
+
 await BulkInsertTestAsync();
 await BatchInsertTestAsync();
 
@@ -23,42 +25,39 @@ async Task BatchInsertTestAsync()
         var source100000 = GenerateDataToInsert(100000);
         var source1000000 = GenerateDataToInsert(1000000);
 
-        using (var connection = await ClickHouseWrapper.GetConnectionAsync(settings))
-        {
-            var sw = new Stopwatch();
+        var sw = new Stopwatch();
 
-            sw.Start();
+        sw.Start();
 
-            await ClickHouseWrapper.BatchInsertAsync(connection, source1000);
+        await repository.BatchInsertAsync(source1000, 100000);
 
-            sw.Stop();
+        sw.Stop();
 
-            $"1.000 rows insert elapsed in {sw.Elapsed}".PrintInfo();
-            sw.Reset();
-            sw.Start();
+        $"1.000 rows insert elapsed in {sw.Elapsed}".PrintInfo();
+        sw.Reset();
+        sw.Start();
 
-            await ClickHouseWrapper.BatchInsertAsync(connection, source10000);
+        await repository.BatchInsertAsync(source10000, 100000);
 
-            sw.Stop();
+        sw.Stop();
 
-            $"10.000 rows insert elapsed in {sw.Elapsed}".PrintInfo();
-            sw.Reset();
-            sw.Start();
+        $"10.000 rows insert elapsed in {sw.Elapsed}".PrintInfo();
+        sw.Reset();
+        sw.Start();
 
-            await ClickHouseWrapper.BatchInsertAsync(connection, source100000);
+        await repository.BatchInsertAsync(source100000, 100000);
 
-            sw.Stop();
+        sw.Stop();
 
-            $"100.000 rows insert elapsed in {sw.Elapsed}".PrintInfo();
-            sw.Reset();
-            sw.Start();
+        $"100.000 rows insert elapsed in {sw.Elapsed}".PrintInfo();
+        sw.Reset();
+        sw.Start();
 
-            await ClickHouseWrapper.BatchInsertAsync(connection, source1000000);
+        await repository.BatchInsertAsync(source1000000, 100000);
 
-            sw.Stop();
+        sw.Stop();
 
-            $"1.000.000 rows insert elapsed in {sw.Elapsed}".PrintInfo();
-        }
+        $"1.000.000 rows insert elapsed in {sw.Elapsed}".PrintInfo();
 
         //ClickHouse  - Batch -     1.000 rows insert elapsed in 00:00:00.9968200
         //MySqlServer - Batch -     1.000 rows insert elapsed in 00:00:03.1916450
@@ -91,7 +90,7 @@ async Task BulkInsertTestAsync()
 
         sw.Start();
 
-        await ClickHouseWrapper.BulkInsertAsync(settings, source1000);
+        await repository.BulkInsertAsync(source1000);
 
         sw.Stop();
 
@@ -99,7 +98,7 @@ async Task BulkInsertTestAsync()
         sw.Reset();
         sw.Start();
 
-        await ClickHouseWrapper.BulkInsertAsync(settings, source10000);
+        await repository.BulkInsertAsync(source10000);
 
         sw.Stop();
 
@@ -107,7 +106,7 @@ async Task BulkInsertTestAsync()
         sw.Reset();
         sw.Start();
 
-        await ClickHouseWrapper.BulkInsertAsync(settings, source100000);
+        await repository.BulkInsertAsync(source100000);
 
         sw.Stop();
 
@@ -115,7 +114,7 @@ async Task BulkInsertTestAsync()
         sw.Reset();
         sw.Start();
 
-        await ClickHouseWrapper.BulkInsertAsync(settings, source1000000);
+        await repository.BulkInsertAsync(source1000000);
 
         sw.Stop();
 

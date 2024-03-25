@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using Wanadi.Clickhouse.Models;
+using Wanadi.Common.Attributes;
 
 namespace Wanadi.Clickhouse.Examples;
 
-[Table("wanadi_test")]
+[Table("wanadi_test"), Database("wanadi")]
 public class TableTestEntity : ClickHouseEnumeratorEntity
 {
     public TableTestEntity() { }
