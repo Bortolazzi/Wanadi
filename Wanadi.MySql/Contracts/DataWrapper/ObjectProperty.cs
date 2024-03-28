@@ -11,6 +11,8 @@ public class ObjectProperty
 {
     public ObjectProperty(PropertyInfo propertyInfo, EnumConditions enumOption, GuidConditions guidOption)
     {
+        OriginalPropertyInfo = propertyInfo;
+
         Name = propertyInfo.Name;
         PropertyType = propertyInfo.PropertyType;
 
@@ -77,6 +79,8 @@ public class ObjectProperty
 
         CastTypeToMySql(enumOption, guidOption);
     }
+
+    public PropertyInfo OriginalPropertyInfo { get; set; }
 
     /// <summary>
     ///     <para>
@@ -244,9 +248,21 @@ public class ObjectProperty
             return;
         }
 
-        if (PropertyType == typeof(decimal) || PropertyType == typeof(float) || PropertyType == typeof(double))
+        if (PropertyType == typeof(decimal))
         {
             MySqlType = "decimal";
+            return;
+        }
+
+        if (PropertyType == typeof(float))
+        {
+            MySqlType = "float";
+            return;
+        }
+
+        if (PropertyType == typeof(double))
+        {
+            MySqlType = "double";
             return;
         }
 
@@ -277,6 +293,24 @@ public class ObjectProperty
         if (PropertyType == typeof(string))
         {
             MySqlType = "varchar";
+            return;
+        }
+
+        if (PropertyType == typeof(TimeSpan))
+        {
+            MySqlType = "time";
+            return;
+        }
+
+        if (PropertyType == typeof(byte))
+        {
+            MySqlType = "byte";
+            return;
+        }
+
+        if (PropertyType == typeof(char[]))
+        {
+            MySqlType = "char[]";
             return;
         }
 

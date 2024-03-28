@@ -4,9 +4,9 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<NoWarn>$(NoWarn);NU1803</NoWarn>
-		<Version>8.0.7</Version>
+		<Version>8.0.2</Version>
 		<Authors>Renato Bortolazzi Junior</Authors>
-		<PackageDescription>Funcionalidades comuns utilizadas em projetos e no Wanadi.MySql.</PackageDescription>
+		<PackageDescription>Funcionalidades para facilitar execução de operações em Clickhouse com .net core.</PackageDescription>
 		<RepositoryUrl>https://github.com/Bortolazzi/Wanadi</RepositoryUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
@@ -15,7 +15,10 @@
 		<None Include="../README.md" Pack="true" PackagePath="/" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Microsoft.ProgramSynthesis.Detection" Version="8.32.0" />
-		<PackageReference Include="Microsoft.Extensions.Primitives" Version="8.0.0" />
+		<ProjectReference Include="..\Wanadi.Common\Wanadi.Common.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="ClickHouse.Ado" Version="2.0.3" />
+		<PackageReference Include="ClickHouse.Client" Version="7.2.0" />
 	</ItemGroup>
 </Project>

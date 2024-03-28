@@ -16,6 +16,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{3DD0EE9C-0
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wanadi.Clickhouse", "Wanadi.Clickhouse\Wanadi.Clickhouse.csproj", "{BF3DD1BC-397A-4EDF-ABA9-5C588F67AAE4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wanadi.Clickhouse.Examples", "Wanadi.Clickhouse.Examples\Wanadi.Clickhouse.Examples.csproj", "{545E601F-8538-4B2E-93EF-D41B231169DF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A6FEFA05-D3D1-4D83-9AEC-3F2A1F29D86E}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +47,14 @@ Global
 		{4BA5A877-898E-4C9B-A8DE-0EA055C3B512}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4BA5A877-898E-4C9B-A8DE-0EA055C3B512}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4BA5A877-898E-4C9B-A8DE-0EA055C3B512}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF3DD1BC-397A-4EDF-ABA9-5C588F67AAE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF3DD1BC-397A-4EDF-ABA9-5C588F67AAE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF3DD1BC-397A-4EDF-ABA9-5C588F67AAE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF3DD1BC-397A-4EDF-ABA9-5C588F67AAE4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{545E601F-8538-4B2E-93EF-D41B231169DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{545E601F-8538-4B2E-93EF-D41B231169DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{545E601F-8538-4B2E-93EF-D41B231169DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{545E601F-8538-4B2E-93EF-D41B231169DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

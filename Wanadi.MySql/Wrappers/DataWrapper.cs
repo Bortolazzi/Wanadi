@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Concurrent;
+using System.Data;
 using System.Text;
 using Wanadi.Common.Enums;
 using Wanadi.Common.Extensions;
@@ -868,6 +869,34 @@ public static class DataWrapper
         {
             createScript.Clear();
         }
+    }
+
+    public static DataTable? CastListToDataTableBulkInsert<TType>(List<TType> sourceItems, params string[] fieldsIgnore)
+    {
+        if (sourceItems == null || sourceItems.Count == 0)
+            return null;
+
+        var response = new DataTable();
+
+        var properties = GetObjectPropertiesByType(typeof(TType), fieldsIgnore);
+
+        foreach (var property in properties)
+            response.Columns.Add(property.ColumnName, property.PropertyType);
+
+        foreach (var item in sourceItems)
+        {
+            var row = response.NewRow();
+
+            foreach (var property in properties)
+            {
+                var value = property.OriginalPropertyInfo.GetValue(item);
+                row[property.ColumnName] = value ?? DBNull.Value;
+            }
+
+            response.Rows.Add(row);
+        }
+
+        return response;
     }
 
     private static List<ObjectProperty> GetObjectPropertiesByType(Type objectType, params string[] fieldsIgnore)
