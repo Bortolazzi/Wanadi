@@ -13,10 +13,14 @@ public class ValueProperty
         var value = objectType.GetProperty(objectProperty.Name).GetValue(item, null);
         if (value == null)
         {
+            Value = "NULL";
+
+            if (objectProperty.PropertyType == typeof(char[]))
+                return;
+
             if (!objectProperty.AllowNull)
                 throw new Exception($"Property {objectProperty.Name} cannot be null");
 
-            Value = "NULL";
             return;
         }
 
@@ -75,6 +79,7 @@ public class ValueProperty
                 throw new Exception("Guid is not allowed to insert. Change DataWrapper.GuidOption and try again.");
 
             Value = $"'{value}'";
+            return;
         }
 
         if (objectProperty.PropertyType == typeof(string))
@@ -109,13 +114,31 @@ public class ValueProperty
 
         if (objectProperty.PropertyType == typeof(float))
         {
-            Value = $"{value.ToString().Replace(",", ".")}'";
+            Value = $"{value.ToString().Replace(",", ".")}";
             return;
         }
 
         if (objectProperty.PropertyType == typeof(double))
         {
-            Value = $"{value.ToString().Replace(",", ".")}'";
+            Value = $"{value.ToString().Replace(",", ".")}";
+            return;
+        }
+
+        if (objectProperty.PropertyType == typeof(char[]))
+        {
+            Value = $"'{MySqlHelper.EscapeString(new string((char[])value))}'";
+            return;
+        }
+
+        if (objectProperty.PropertyType == typeof(TimeSpan))
+        {
+            Value = $"'{MySqlHelper.EscapeString(value.ToString())}'";
+            return;
+        }
+
+        if (objectProperty.PropertyType == typeof(byte))
+        {
+            Value = $"{MySqlHelper.EscapeString(value.ToString())}";
             return;
         }
     }

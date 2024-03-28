@@ -4,7 +4,7 @@ namespace Wanadi.MySql.Examples;
 
 public static class DataGenerator
 {
-    public static string RandomString(int length)
+    public static string? RandomString(int length)
     {
         if (length == 0)
             return null;

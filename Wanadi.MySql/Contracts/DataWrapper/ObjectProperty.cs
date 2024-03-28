@@ -248,9 +248,21 @@ public class ObjectProperty
             return;
         }
 
-        if (PropertyType == typeof(decimal) || PropertyType == typeof(float) || PropertyType == typeof(double))
+        if (PropertyType == typeof(decimal))
         {
             MySqlType = "decimal";
+            return;
+        }
+
+        if (PropertyType == typeof(float))
+        {
+            MySqlType = "float";
+            return;
+        }
+
+        if (PropertyType == typeof(double))
+        {
+            MySqlType = "double";
             return;
         }
 
@@ -281,6 +293,24 @@ public class ObjectProperty
         if (PropertyType == typeof(string))
         {
             MySqlType = "varchar";
+            return;
+        }
+
+        if (PropertyType == typeof(TimeSpan))
+        {
+            MySqlType = "time";
+            return;
+        }
+
+        if (PropertyType == typeof(byte))
+        {
+            MySqlType = "byte";
+            return;
+        }
+
+        if (PropertyType == typeof(char[]))
+        {
+            MySqlType = "char[]";
             return;
         }
 

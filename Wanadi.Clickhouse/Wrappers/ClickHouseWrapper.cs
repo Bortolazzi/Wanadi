@@ -2,6 +2,7 @@
 using ClickHouse.Ado;
 using ClickHouse.Client.Copy;
 using Wanadi.Clickhouse.Contracts;
+using Wanadi.Common.Contracts.PropertyMappers;
 using Wanadi.Common.Extensions;
 using Wanadi.Common.Helpers;
 
@@ -285,7 +286,7 @@ public static class ClickHouseWrapper
 
     #endregion [Bulk Insert]
 
-    private static IEnumerable<object[]> ConvertListToBulkInsert<TType>(List<TType> sourceItems, List<PropertyDataWrapper> properties) where TType : class
+    private static IEnumerable<object[]> ConvertListToBulkInsert<TType>(List<TType> sourceItems, List<PropertyDataType> properties) where TType : class
     {
         var response = new List<object[]>();
 
@@ -295,7 +296,7 @@ public static class ClickHouseWrapper
 
             foreach (var prop in properties)
             {
-                propertyValues.Add(prop.OriginalPropertyInfo.GetValue(item));
+                propertyValues.Add(prop.PropertyInfo.GetValue(item));
             }
 
             response.Add(propertyValues.ToArray());
@@ -312,15 +313,15 @@ public static class ClickHouseWrapper
         return $"INSERT INTO {tableName} ({string.Join(", ", properties.Select(t => t.ColumnName).ToList())}) VALUES @batch";
     }
 
-    private static List<PropertyDataWrapper> GetPropertiesToInsert(Type objectType)
+    private static List<PropertyDataType> GetPropertiesToInsert(Type objectType)
     {
-        var properties = objectType.GetProperties().Select(t => new PropertyDataWrapper(t)).ToList();
+        var properties = objectType.GetProperties().Select(t => new PropertyDataType(t)).ToList();
         return properties.Where(t => !t.IgnoreOnInsert).OrderBy(t => t.ColumnName).ToList();
     }
 
     private static List<ClickHouseColumnsResultDataType> GetResultFields<TType>(ClickHouseDataReader dataReader) where TType : class
     {
-        var properties = typeof(TType).GetProperties().Select(t => new PropertyDataWrapper(t)).ToList();
+        var properties = typeof(TType).GetProperties().Select(t => new PropertyDataType(t)).ToList();
 
         var response = new List<ClickHouseColumnsResultDataType>();
 
@@ -330,7 +331,7 @@ public static class ClickHouseWrapper
 
             var property = properties.FirstOrDefault(t => t.ColumnName == dataReaderField.ColumnName);
             if (property != null)
-                response.Add(dataReaderField.SetPropertyInfo(property.OriginalPropertyInfo));
+                response.Add(dataReaderField.SetPropertyInfo(property.PropertyInfo));
         }
 
         return response.Where(t => t.Property != null).ToList();

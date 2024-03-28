@@ -1,14 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
-using Wanadi.Common.Extensions;
 
-namespace Wanadi.Clickhouse.Contracts;
+namespace Wanadi.Common.Contracts.PropertyMappers;
 
-public class PropertyDataWrapper
+public class PropertyDataType
 {
-    public PropertyDataWrapper(PropertyInfo property)
+    public PropertyDataType(PropertyInfo property)
     {
-        OriginalPropertyInfo = property;
+        PropertyInfo = property;
         Name = property.Name;
 
         var columnAttribute = property.GetAttribute<ColumnAttribute>();
@@ -28,7 +27,7 @@ public class PropertyDataWrapper
         }
     }
 
-    public PropertyInfo OriginalPropertyInfo { get; set; }
+    public PropertyInfo PropertyInfo { get; set; }
     public string Name { get; set; }
     public string ColumnName
     {
