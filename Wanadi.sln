@@ -25,6 +25,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wanadi.PostgreSql", "Wanadi.PostgreSql\Wanadi.PostgreSql.csproj", "{A4DED2B6-848D-4792-B378-64279FC53478}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wanadi.PostgreSql.Examples", "Wanadi.PostgreSql.Examples\Wanadi.PostgreSql.Examples.csproj", "{D1A05B91-DA0A-41DC-9BC9-9DCCE3CC1446}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +59,14 @@ Global
 		{545E601F-8538-4B2E-93EF-D41B231169DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{545E601F-8538-4B2E-93EF-D41B231169DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{545E601F-8538-4B2E-93EF-D41B231169DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4DED2B6-848D-4792-B378-64279FC53478}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4DED2B6-848D-4792-B378-64279FC53478}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4DED2B6-848D-4792-B378-64279FC53478}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4DED2B6-848D-4792-B378-64279FC53478}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1A05B91-DA0A-41DC-9BC9-9DCCE3CC1446}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1A05B91-DA0A-41DC-9BC9-9DCCE3CC1446}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1A05B91-DA0A-41DC-9BC9-9DCCE3CC1446}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1A05B91-DA0A-41DC-9BC9-9DCCE3CC1446}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
