@@ -25,6 +25,13 @@ public class PropertyDataType
             PropertyType = Nullable.GetUnderlyingType(PropertyType) ?? PropertyType;
             AllowNull = true;
         }
+
+        if (PropertyType == typeof(string))
+        {
+            var nullableAttribute = property.GetAttribute<System.Runtime.CompilerServices.NullableAttribute>();
+            if (nullableAttribute != null)
+                AllowNull = true;
+        }
     }
 
     public PropertyInfo PropertyInfo { get; set; }

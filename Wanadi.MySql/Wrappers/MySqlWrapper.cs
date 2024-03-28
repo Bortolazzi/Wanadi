@@ -835,61 +835,51 @@ public static class MySqlWrapper
 
         foreach (var resultField in resultFields)
         {
+            if (reader.IsDBNull(resultField.ColumnIndex))
+                continue;
+
             object? value = null;
 
-            try
-            {
-                if (resultField.DataType == typeof(Int16))
-                    value = reader.GetInt16(resultField.ColumnIndex);
+            if (resultField.DataType == typeof(Guid))
+                value = reader.GetGuid(resultField.ColumnIndex);
 
-                if (resultField.DataType == typeof(Int32))
-                    value = reader.GetInt32(resultField.ColumnIndex);
+            if (resultField.DataType == typeof(Int16))
+                value = reader.GetInt16(resultField.ColumnIndex);
 
-                if (resultField.DataType == typeof(Int64))
-                    value = reader.GetInt64(resultField.ColumnIndex);
+            if (resultField.DataType == typeof(Int32))
+                value = reader.GetInt32(resultField.ColumnIndex);
 
-                if (resultField.DataType == typeof(byte))
-                    value = reader.GetByte(resultField.ColumnIndex);
+            if (resultField.DataType == typeof(Int64))
+                value = reader.GetInt64(resultField.ColumnIndex);
 
-                if (resultField.DataType == typeof(string))
-                    value = reader.GetString(resultField.ColumnIndex);
+            if (resultField.DataType == typeof(byte))
+                value = reader.GetByte(resultField.ColumnIndex);
 
-                if (resultField.DataType == typeof(decimal))
-                    value = reader.GetDecimal(resultField.ColumnIndex);
+            if (resultField.DataType == typeof(string))
+                value = reader.GetString(resultField.ColumnIndex);
 
-                if (resultField.DataType == typeof(double))
-                    value = reader.GetDouble(resultField.ColumnIndex);
+            if (resultField.DataType == typeof(decimal))
+                value = reader.GetDecimal(resultField.ColumnIndex);
 
-                if (resultField.DataType == typeof(float))
-                    value = reader.GetFloat(resultField.ColumnIndex);
+            if (resultField.DataType == typeof(double))
+                value = reader.GetDouble(resultField.ColumnIndex);
 
-                if (resultField.DataType == typeof(DateTime))
-                    value = reader.GetDateTime(resultField.ColumnIndex);
+            if (resultField.DataType == typeof(float))
+                value = reader.GetFloat(resultField.ColumnIndex);
 
-                if (resultField.DataType == typeof(TimeSpan))
-                    value = reader.GetTimeSpan(resultField.ColumnIndex);
+            if (resultField.DataType == typeof(DateTime))
+                value = reader.GetDateTime(resultField.ColumnIndex);
 
-                if (resultField.DataType == typeof(bool))
-                    value = reader.GetBoolean(resultField.ColumnIndex);
-            }
-            catch (Exception ex)
-            {
-                if (ex.Message == "Data is Null. This method or property cannot be called on Null values.")
-                    continue;
+            if (resultField.DataType == typeof(TimeSpan))
+                value = reader.GetTimeSpan(resultField.ColumnIndex);
 
-                throw;
-            }
+            if (resultField.DataType == typeof(bool))
+                value = reader.GetBoolean(resultField.ColumnIndex);
 
             if (value == null || value == DBNull.Value)
                 continue;
 
             var dataType = Nullable.GetUnderlyingType(resultField.Property.PropertyType) ?? resultField.Property.PropertyType;
-
-            if (dataType == typeof(Guid))
-            {
-                resultField.Property.SetValue(response, Guid.Parse(value.ToString()), null);
-                continue;
-            }
 
             if (dataType == typeof(char[]) && resultField.DataType == typeof(string))
             {
