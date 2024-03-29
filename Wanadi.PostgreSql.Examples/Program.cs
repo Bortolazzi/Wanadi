@@ -9,7 +9,7 @@ using Wanadi.PostgreSql.Wrappers;
 CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("pt-BR");
 CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("pt-BR");
 
-var connectionString = PostgreSqlWrapper.BuildConnectionString("192.168.2.11", "postgres", "postgres", "wanadi");
+var connectionString = PostgreSqlWrapper.BuildConnectionString("192.168.2.11", "postgres", "postgres", "wanadi2");
 
 var lista1000 = GenerateData(1000);
 var lista10000 = GenerateData(10000);
@@ -18,7 +18,7 @@ var lista1000000 = GenerateData(1000000);
 
 var repository = new TableRepository(connectionString);
 
-var readingTest = await repository.SelectQueryAsync<TableEntity>("SELECT * FROM table_test LIMIT 10;");
+var readingTest = await repository.SelectQueryAsync<TableEntity>("select * from  table_test");
 
 var sw = new Stopwatch();
 
@@ -90,7 +90,7 @@ List<TableEntity> GenerateData(int quantity)
     return lista;
 }
 
-[Table("table_test")]
+[Table("teste.table_test")]
 public class TableEntity
 {
     [Column("id"), Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]

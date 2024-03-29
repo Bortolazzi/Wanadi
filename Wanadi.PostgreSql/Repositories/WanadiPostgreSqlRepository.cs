@@ -59,7 +59,7 @@ public abstract class WanadiPostgreSqlRepository<TEntity> : IWanadiPostgreSqlRep
         return Convert.ToInt64(response);
     }
 
-    private async Task<NpgsqlConnection> GetConnectionAsync()
+    public async Task<NpgsqlConnection> GetConnectionAsync()
     {
         if (_connection != null && _connection.State == System.Data.ConnectionState.Open)
             return _connection;
