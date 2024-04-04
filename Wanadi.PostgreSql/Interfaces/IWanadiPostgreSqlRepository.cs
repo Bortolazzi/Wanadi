@@ -1,10 +1,13 @@
-﻿namespace Wanadi.PostgreSql.Interfaces;
+﻿using Npgsql;
+
+namespace Wanadi.PostgreSql.Interfaces;
 
 public interface IWanadiPostgreSqlRepository<TEntity> : IDisposable where TEntity : class
 {
     string GetTableName();
 
     Task AddAsync(TEntity entity);
+    Task UpdateAsync(TEntity entity);
 
     Task<List<TEntity>> ToListAsync();
 
@@ -19,5 +22,9 @@ public interface IWanadiPostgreSqlRepository<TEntity> : IDisposable where TEntit
     Task<int> ExecuteNonQueryAsync(string query);
     Task<object?> ExecuteScalarAsync(string query);
 
+    Task ResetIdentityTable();
+
     Task<long> CountAsync();
+
+    Task<NpgsqlConnection> GetConnectionAsync();
 }

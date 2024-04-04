@@ -188,21 +188,21 @@ public static class PostgreSqlWrapper
 
     #region [ExecuteNonQuery]
 
-    public static int ExecuteNonQuery(string connectionString, string commandExecute)
-        => ExecuteNonQueryAsync(connectionString, commandExecute).GetAwaiter().GetResult();
+    public static int ExecuteNonQuery(string connectionString, string commandExecute, List<NpgsqlParameter>? parameters = null)
+        => ExecuteNonQueryAsync(connectionString, commandExecute, parameters).GetAwaiter().GetResult();
 
-    public static int ExecuteNonQuery(NpgsqlConnection connection, string commandExecute)
-        => ExecuteNonQueryAsync(connection, commandExecute).GetAwaiter().GetResult();
+    public static int ExecuteNonQuery(NpgsqlConnection connection, string commandExecute, List<NpgsqlParameter>? parameters = null)
+        => ExecuteNonQueryAsync(connection, commandExecute, parameters).GetAwaiter().GetResult();
 
-    public static async Task<int> ExecuteNonQueryAsync(string connectionString, string commandExecute)
+    public static async Task<int> ExecuteNonQueryAsync(string connectionString, string commandExecute, List<NpgsqlParameter>? parameters = null)
     {
         using (var connection = await GetConnectionAsync(connectionString))
         {
-            return await ExecuteNonQueryAsync(connection, commandExecute);
+            return await ExecuteNonQueryAsync(connection, commandExecute, parameters);
         }
     }
 
-    public static async Task<int> ExecuteNonQueryAsync(NpgsqlConnection connection, string commandExecute)
+    public static async Task<int> ExecuteNonQueryAsync(NpgsqlConnection connection, string commandExecute, List<NpgsqlParameter>? parameters = null)
     {
         if (connection.State != ConnectionState.Open)
             await connection.OpenAsync();
@@ -210,6 +210,12 @@ public static class PostgreSqlWrapper
         using (var command = new NpgsqlCommand(commandExecute, connection))
         {
             command.CommandType = CommandType.Text;
+
+            if (parameters is not null && parameters.Count > 0)
+            {
+                parameters.ForEach(t => command.Parameters.Add(t));
+                await command.PrepareAsync();
+            }
 
             return await command.ExecuteNonQueryAsync();
         }
@@ -363,6 +369,8 @@ public static class PostgreSqlWrapper
             throw new Exception("Unable to identify table name or object name.");
 
         var properties = await MapPropertiesAsync<TType>(connection, tableName);
+        properties = properties.Where(t => !t.IgnoreOnInsert).ToList();
+
         var columns = string.Join(',', properties.Select(t => t.ColumnName).ToList());
         var commandPrefix = $"COPY {tableName} ({columns}) FROM STDIN (FORMAT BINARY)";
 
@@ -394,9 +402,9 @@ public static class PostgreSqlWrapper
 
     #endregion [BinaryImport]
 
-    private static async Task<List<PostgreSqlPropertyDataType>> MapPropertiesAsync<TType>(NpgsqlConnection connection, string tableName) where TType : class
+    public static async Task<List<PostgreSqlPropertyDataType>> MapPropertiesAsync<TType>(NpgsqlConnection connection, string tableName) where TType : class
     {
-        var properties = typeof(TType).GetProperties().Select(t => new PostgreSqlPropertyDataType(t)).Where(t => !t.IgnoreOnInsert).ToList();
+        var properties = typeof(TType).GetProperties().Select(t => new PostgreSqlPropertyDataType(t)).ToList();
         var dbColumns = await DescribeTableAsync(connection, tableName);
 
         properties = (from a in properties

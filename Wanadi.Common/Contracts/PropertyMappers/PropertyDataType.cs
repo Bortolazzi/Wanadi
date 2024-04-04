@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
 
 namespace Wanadi.Common.Contracts.PropertyMappers;
@@ -17,6 +18,10 @@ public class PropertyDataType
         var databaseGeneratedAttribute = property.GetAttribute<DatabaseGeneratedAttribute>();
         if (databaseGeneratedAttribute != null)
             IgnoreOnInsert = true;
+
+        var keyAttribute = property.GetAttribute<KeyAttribute>();
+        if (keyAttribute != null)
+            HasKeyAttribute = true;
 
         PropertyType = property.PropertyType;
 
@@ -46,4 +51,5 @@ public class PropertyDataType
     public Type PropertyType { get; set; }
     public bool AllowNull { get; set; } = false;
     public bool IgnoreOnInsert { get; set; } = false;
+    public bool HasKeyAttribute { get; set; } = false;
 }
