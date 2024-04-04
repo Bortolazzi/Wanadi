@@ -8,6 +8,10 @@ A ideia é manter o projeto atualizado e crescendo com algumas funcionalidades q
     - Disponível para .net6 e .net8
 * **NuGet Wanadi.MySql** https://www.nuget.org/packages/Wanadi.MySql
     - Disponível para .net6 e .net8
+* **NuGet Wanadi.Clickhouse** https://www.nuget.org/packages/Wanadi.Clickhouse
+    - Disponível para .net8
+* **NuGet Wanadi.PostgreSql** https://www.nuget.org/packages/Wanadi.PostgreSql
+    - Disponível para .net8
 
 --------------------------------------------------------------------------------------------------
 ## Resultado de teste de inserção.
