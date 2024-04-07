@@ -371,6 +371,9 @@ public static class PostgreSqlWrapper
         var properties = await MapPropertiesAsync<TType>(connection, tableName);
         properties = properties.Where(t => !t.IgnoreOnInsert).ToList();
 
+        if (properties.Count == 0)
+            throw new Exception($"Unable to map object properties with database columns.");
+
         var columns = string.Join(',', properties.Select(t => t.ColumnName).ToList());
         var commandPrefix = $"COPY {tableName} ({columns}) FROM STDIN (FORMAT BINARY)";
 
@@ -391,7 +394,7 @@ public static class PostgreSqlWrapper
                         await binaryImporter.WriteNullAsync();
                         continue;
                     }
-
+                    
                     await binaryImporter.WriteAsync(value, property.PostgreSqlType);
                 }
             }

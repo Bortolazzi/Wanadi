@@ -97,7 +97,7 @@ public abstract class WanadiPostgreSqlRepository<TEntity> : IWanadiPostgreSqlRep
     public async Task<object?> ExecuteScalarAsync(string query)
         => await PostgreSqlWrapper.ExecuteScalarAsync(await GetConnectionAsync(), query);
 
-    public async Task ResetIdentityTable()
+    public async Task ResetIdentityTableAsync()
         => await PostgreSqlWrapper.ExecuteNonQueryAsync(await GetConnectionAsync(), $"TRUNCATE TABLE {GetTableName()} RESTART IDENTITY;");
 
     public async Task<long> CountAsync()

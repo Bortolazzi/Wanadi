@@ -22,7 +22,7 @@ public interface IWanadiPostgreSqlRepository<TEntity> : IDisposable where TEntit
     Task<int> ExecuteNonQueryAsync(string query);
     Task<object?> ExecuteScalarAsync(string query);
 
-    Task ResetIdentityTable();
+    Task ResetIdentityTableAsync();
 
     Task<long> CountAsync();
 
