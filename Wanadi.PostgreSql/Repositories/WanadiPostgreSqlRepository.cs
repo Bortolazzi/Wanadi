@@ -26,6 +26,9 @@ public abstract class WanadiPostgreSqlRepository<TEntity> : IWanadiPostgreSqlRep
         await BinaryImportAsync(source);
     }
 
+    public async Task<TEntity?> GetByIdAsync(int id)
+        => await FirstOrDefaultAsync($"SELECT * FROM {GetTableName()} WHERE id = {id};");
+
     public async Task UpdateAsync(TEntity entity)
     {
         if (entity is null)
@@ -76,26 +79,29 @@ public abstract class WanadiPostgreSqlRepository<TEntity> : IWanadiPostgreSqlRep
     public async Task<List<TEntity>> ToListAsync()
         => await PostgreSqlWrapper.SelectQueryByEntityAsync<TEntity>(await GetConnectionAsync());
 
-    public async Task<List<TEntity>> SelectQueryAsync(string query)
-        => await PostgreSqlWrapper.SelectQueryAsync<TEntity>(await GetConnectionAsync(), query);
+    public async Task<List<TEntity>> SelectQueryAsync(string query, List<NpgsqlParameter>? parameters = null)
+        => await PostgreSqlWrapper.SelectQueryAsync<TEntity>(await GetConnectionAsync(), query, parameters);
 
-    public async Task<List<T>> SelectQueryAsync<T>(string query) where T : class
-        => await PostgreSqlWrapper.SelectQueryAsync<T>(await GetConnectionAsync(), query);
+    public async Task<List<T>> SelectQueryAsync<T>(string query, List<NpgsqlParameter>? parameters = null) where T : class
+        => await PostgreSqlWrapper.SelectQueryAsync<T>(await GetConnectionAsync(), query, parameters);
 
-    public async Task<TEntity?> FirstOrDefaultAsync(string query)
-        => await PostgreSqlWrapper.SelectQueryFirstOrDefaultAsync<TEntity>(await GetConnectionAsync(), query);
+    public async Task<TEntity?> FirstOrDefaultAsync(string query, List<NpgsqlParameter>? parameters = null)
+        => await PostgreSqlWrapper.SelectQueryFirstOrDefaultAsync<TEntity>(await GetConnectionAsync(), query, parameters);
 
-    public async Task<T?> FirstOrDefaultAsync<T>(string query) where T : class
-        => await PostgreSqlWrapper.SelectQueryFirstOrDefaultAsync<T>(await GetConnectionAsync(), query);
+    public async Task<T?> FirstOrDefaultAsync<T>(string query, List<NpgsqlParameter>? parameters = null) where T : class
+        => await PostgreSqlWrapper.SelectQueryFirstOrDefaultAsync<T>(await GetConnectionAsync(), query, parameters);
 
     public async Task BinaryImportAsync(List<TEntity> entities)
         => await PostgreSqlWrapper.BinaryImportAsync(await GetConnectionAsync(), entities);
 
-    public async Task<int> ExecuteNonQueryAsync(string query)
-        => await PostgreSqlWrapper.ExecuteNonQueryAsync(await GetConnectionAsync(), query);
+    public async Task<int> ExecuteNonQueryAsync(string query, List<NpgsqlParameter>? parameters = null)
+        => await PostgreSqlWrapper.ExecuteNonQueryAsync(await GetConnectionAsync(), query, parameters);
 
-    public async Task<object?> ExecuteScalarAsync(string query)
-        => await PostgreSqlWrapper.ExecuteScalarAsync(await GetConnectionAsync(), query);
+    public async Task<object?> ExecuteScalarAsync(string query, List<NpgsqlParameter>? parameters = null)
+        => await PostgreSqlWrapper.ExecuteScalarAsync(await GetConnectionAsync(), query, parameters);
+
+    public async Task TruncateTableAsync()
+        => await PostgreSqlWrapper.ExecuteNonQueryAsync(await GetConnectionAsync(), $"TRUNCATE TABLE {GetTableName()};");
 
     public async Task ResetIdentityTableAsync()
         => await PostgreSqlWrapper.ExecuteNonQueryAsync(await GetConnectionAsync(), $"TRUNCATE TABLE {GetTableName()} RESTART IDENTITY;");

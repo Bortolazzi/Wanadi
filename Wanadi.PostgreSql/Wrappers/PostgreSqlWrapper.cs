@@ -61,21 +61,21 @@ public static class PostgreSqlWrapper
 
     #region [SelectQueryAsync]
 
-    public static List<TType> SelectQuery<TType>(string connectionString, string commandQuery) where TType : class
-        => SelectQueryAsync<TType>(connectionString, commandQuery).GetAwaiter().GetResult();
+    public static List<TType> SelectQuery<TType>(string connectionString, string commandQuery, List<NpgsqlParameter>? parameters = null) where TType : class
+        => SelectQueryAsync<TType>(connectionString, commandQuery, parameters).GetAwaiter().GetResult();
 
-    public static List<TType> SelectQuery<TType>(NpgsqlConnection connection, string commandQuery) where TType : class
-        => SelectQueryAsync<TType>(connection, commandQuery).GetAwaiter().GetResult();
+    public static List<TType> SelectQuery<TType>(NpgsqlConnection connection, string commandQuery, List<NpgsqlParameter>? parameters = null) where TType : class
+        => SelectQueryAsync<TType>(connection, commandQuery, parameters).GetAwaiter().GetResult();
 
-    public static async Task<List<TType>> SelectQueryAsync<TType>(string connectionString, string commandQuery) where TType : class
+    public static async Task<List<TType>> SelectQueryAsync<TType>(string connectionString, string commandQuery, List<NpgsqlParameter>? parameters = null) where TType : class
     {
         using (var connection = await GetConnectionAsync(connectionString))
         {
-            return await SelectQueryAsync<TType>(connection, commandQuery);
+            return await SelectQueryAsync<TType>(connection, commandQuery, parameters);
         }
     }
 
-    public static async Task<List<TType>> SelectQueryAsync<TType>(NpgsqlConnection connection, string commandQuery) where TType : class
+    public static async Task<List<TType>> SelectQueryAsync<TType>(NpgsqlConnection connection, string commandQuery, List<NpgsqlParameter>? parameters = null) where TType : class
     {
         if (connection.State != ConnectionState.Open)
             await connection.OpenAsync();
@@ -83,6 +83,12 @@ public static class PostgreSqlWrapper
         using (var command = new NpgsqlCommand(commandQuery, connection))
         {
             command.CommandType = CommandType.Text;
+
+            if (parameters is not null && parameters.Count > 0)
+            {
+                parameters.ForEach(t => command.Parameters.Add(t));
+                await command.PrepareAsync();
+            }
 
             using (var reader = await command.ExecuteReaderAsync())
             {
@@ -140,21 +146,21 @@ public static class PostgreSqlWrapper
 
     #region [SelectQueryFirstOrDefaultAsync]
 
-    public static TType? SelectQueryFirstOrDefault<TType>(string connectionString, string commandQuery) where TType : class
-        => SelectQueryFirstOrDefaultAsync<TType>(connectionString, commandQuery).GetAwaiter().GetResult();
+    public static TType? SelectQueryFirstOrDefault<TType>(string connectionString, string commandQuery, List<NpgsqlParameter>? parameters = null) where TType : class
+        => SelectQueryFirstOrDefaultAsync<TType>(connectionString, commandQuery, parameters).GetAwaiter().GetResult();
 
-    public static TType? SelectQueryFirstOrDefault<TType>(NpgsqlConnection connection, string commandQuery) where TType : class
-        => SelectQueryFirstOrDefaultAsync<TType>(connection, commandQuery).GetAwaiter().GetResult();
+    public static TType? SelectQueryFirstOrDefault<TType>(NpgsqlConnection connection, string commandQuery, List<NpgsqlParameter>? parameters = null) where TType : class
+        => SelectQueryFirstOrDefaultAsync<TType>(connection, commandQuery, parameters).GetAwaiter().GetResult();
 
-    public static async Task<TType?> SelectQueryFirstOrDefaultAsync<TType>(string connectionString, string commandQuery) where TType : class
+    public static async Task<TType?> SelectQueryFirstOrDefaultAsync<TType>(string connectionString, string commandQuery, List<NpgsqlParameter>? parameters = null) where TType : class
     {
         using (var connection = await GetConnectionAsync(connectionString))
         {
-            return await SelectQueryFirstOrDefaultAsync<TType>(connection, commandQuery);
+            return await SelectQueryFirstOrDefaultAsync<TType>(connection, commandQuery, parameters);
         }
     }
 
-    public static async Task<TType?> SelectQueryFirstOrDefaultAsync<TType>(NpgsqlConnection connection, string commandQuery) where TType : class
+    public static async Task<TType?> SelectQueryFirstOrDefaultAsync<TType>(NpgsqlConnection connection, string commandQuery, List<NpgsqlParameter>? parameters = null) where TType : class
     {
         if (connection.State != ConnectionState.Open)
             await connection.OpenAsync();
@@ -162,6 +168,12 @@ public static class PostgreSqlWrapper
         using (var command = new NpgsqlCommand(commandQuery, connection))
         {
             command.CommandType = CommandType.Text;
+
+            if (parameters is not null && parameters.Count > 0)
+            {
+                parameters.ForEach(t => command.Parameters.Add(t));
+                await command.PrepareAsync();
+            }
 
             using (var reader = await command.ExecuteReaderAsync())
             {
@@ -225,21 +237,21 @@ public static class PostgreSqlWrapper
 
     #region [ExecuteScalar]
 
-    public static object? ExecuteScalar(string connectionString, string commandExecute)
-        => ExecuteScalarAsync(connectionString, commandExecute).GetAwaiter().GetResult();
+    public static object? ExecuteScalar(string connectionString, string commandExecute, List<NpgsqlParameter>? parameters = null)
+        => ExecuteScalarAsync(connectionString, commandExecute, parameters).GetAwaiter().GetResult();
 
-    public static object? ExecuteScalar(NpgsqlConnection connection, string commandExecute)
-        => ExecuteScalarAsync(connection, commandExecute).GetAwaiter().GetResult();
+    public static object? ExecuteScalar(NpgsqlConnection connection, string commandExecute, List<NpgsqlParameter>? parameters = null)
+        => ExecuteScalarAsync(connection, commandExecute, parameters).GetAwaiter().GetResult();
 
-    public static async Task<object?> ExecuteScalarAsync(string connectionString, string commandExecute)
+    public static async Task<object?> ExecuteScalarAsync(string connectionString, string commandExecute, List<NpgsqlParameter>? parameters = null)
     {
         using (var connection = await GetConnectionAsync(connectionString))
         {
-            return ExecuteScalarAsync(connection, commandExecute);
+            return ExecuteScalarAsync(connection, commandExecute, parameters);
         }
     }
 
-    public static async Task<object?> ExecuteScalarAsync(NpgsqlConnection connection, string commandExecute)
+    public static async Task<object?> ExecuteScalarAsync(NpgsqlConnection connection, string commandExecute, List<NpgsqlParameter>? parameters = null)
     {
         if (connection.State != ConnectionState.Open)
             await connection.OpenAsync();
@@ -247,6 +259,12 @@ public static class PostgreSqlWrapper
         using (var command = new NpgsqlCommand(commandExecute, connection))
         {
             command.CommandType = CommandType.Text;
+
+            if (parameters is not null && parameters.Count > 0)
+            {
+                parameters.ForEach(t => command.Parameters.Add(t));
+                await command.PrepareAsync();
+            }
 
             return await command.ExecuteScalarAsync();
         }
