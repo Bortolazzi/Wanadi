@@ -29,6 +29,9 @@ public abstract class WanadiPostgreSqlRepository<TEntity> : IWanadiPostgreSqlRep
     public async Task<TEntity?> GetByIdAsync(int id)
         => await FirstOrDefaultAsync($"SELECT * FROM {GetTableName()} WHERE id = {id};");
 
+    public async Task DeleteByIdAsync(int id)
+        => await ExecuteNonQueryAsync($"DELETE FROM {GetTableName()} WHERE id = {id};");
+
     public async Task UpdateAsync(TEntity entity)
     {
         if (entity is null)

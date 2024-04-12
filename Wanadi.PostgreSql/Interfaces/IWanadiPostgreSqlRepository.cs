@@ -10,6 +10,7 @@ public interface IWanadiPostgreSqlRepository<TEntity> : IDisposable where TEntit
     Task UpdateAsync(TEntity entity);
 
     Task<TEntity?> GetByIdAsync(int id);
+    Task DeleteByIdAsync(int id);
 
     Task<List<TEntity>> ToListAsync();
 
