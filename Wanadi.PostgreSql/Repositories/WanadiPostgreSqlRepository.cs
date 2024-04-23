@@ -20,10 +20,51 @@ public abstract class WanadiPostgreSqlRepository<TEntity> : IWanadiPostgreSqlRep
     public string GetTableName()
         => typeof(TEntity).GetTableName();
 
-    public async Task AddAsync(TEntity entity)
+    public async Task<TEntity?> AddAsync(TEntity entity)
     {
-        var source = new List<TEntity>() { entity };
-        await BinaryImportAsync(source);
+        if (entity is null)
+            return null;
+
+        if (entity == default(TEntity))
+            return null;
+
+        var properties = await PostgreSqlWrapper.MapPropertiesAsync<TEntity>(await GetConnectionAsync(), GetTableName());
+
+        if (properties.Count(t => t.HasKeyAttribute) == 0)
+            throw new Exception($"Entity does not have an identifier defined in the properties. (KeyAttribute)");
+
+        if (properties.Count(t => t.HasKeyAttribute) > 1)
+            throw new Exception($"Entity has more than one identifying property. Method only allows one. (KeyAttribute)");
+
+        var identifier = properties.FirstOrDefault(t => t.HasKeyAttribute);
+
+        properties = properties.Where(t => !t.IgnoreOnInsert).ToList();
+        if (properties.Count == 0)
+            throw new Exception($"Unable to identify entity properties.");
+
+        var parameters = new List<NpgsqlParameter>();
+
+        foreach (var property in properties)
+        {
+            var value = property.PropertyInfo.GetValue(entity);
+            if (value == null && !property.AllowNull)
+                throw new Exception($"Property {property.Name} does not allow null values.");
+
+            if (value == null)
+                value = DBNull.Value;
+
+            var parameterToAdd = new NpgsqlParameter($"@{property.ColumnName}", property.PostgreSqlType);
+            parameterToAdd.Value = value;
+            parameters.Add(parameterToAdd);
+        }
+
+        var commandToExecute = $"INSERT INTO {GetTableName()} ({string.Join(", ", properties.Select(t => t.ColumnName).ToList())}) VALUES ({string.Join(", ", properties.Select(t => $"@{t.ColumnName}").ToList())}) returning {identifier.ColumnName};";
+
+        var idValue = await PostgreSqlWrapper.ExecuteScalarAsync(await GetConnectionAsync(), commandToExecute, parameters);
+
+        identifier.PropertyInfo.SetValue(entity, idValue);
+
+        return entity;
     }
 
     public async Task<TEntity?> GetByIdAsync(int id)
@@ -75,7 +116,7 @@ public abstract class WanadiPostgreSqlRepository<TEntity> : IWanadiPostgreSqlRep
             parameters.Add(parameterToAdd);
         }
 
-        var commandToExecute = $"UPDATE {GetTableName()} SET {string.Join(", ", properties.Select(t=> $"{t.ColumnName} = @{t.ColumnName}").ToList())} WHERE {identifier.ColumnName} = @{identifier.ColumnName};";
+        var commandToExecute = $"UPDATE {GetTableName()} SET {string.Join(", ", properties.Select(t => $"{t.ColumnName} = @{t.ColumnName}").ToList())} WHERE {identifier.ColumnName} = @{identifier.ColumnName};";
         await PostgreSqlWrapper.ExecuteNonQueryAsync(await GetConnectionAsync(), commandToExecute, parameters);
     }
 

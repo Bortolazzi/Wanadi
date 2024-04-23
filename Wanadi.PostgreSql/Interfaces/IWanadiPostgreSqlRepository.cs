@@ -6,7 +6,7 @@ public interface IWanadiPostgreSqlRepository<TEntity> : IDisposable where TEntit
 {
     string GetTableName();
 
-    Task AddAsync(TEntity entity);
+    Task<TEntity?> AddAsync(TEntity entity);
     Task UpdateAsync(TEntity entity);
 
     Task<TEntity?> GetByIdAsync(int id);

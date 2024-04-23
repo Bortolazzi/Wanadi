@@ -33,8 +33,10 @@ public class PropertyDataType
 
         if (PropertyType == typeof(string))
         {
-            var nullableAttribute = property.GetAttribute<System.Runtime.CompilerServices.NullableAttribute>();
-            if (nullableAttribute != null)
+            var nullabilityInfoContext = new NullabilityInfoContext();
+            var nullabilityInfo = nullabilityInfoContext.Create(property);
+
+            if (nullabilityInfo is not null && nullabilityInfo.ReadState == NullabilityState.Nullable)
                 AllowNull = true;
         }
     }
