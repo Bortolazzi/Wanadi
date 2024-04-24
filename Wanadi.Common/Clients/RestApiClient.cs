@@ -60,8 +60,8 @@ public abstract class RestApiClient : IDisposable
     /// </summary>
     protected bool IgnoreResponseDeserializeError { get; set; } = false;
 
-    private HttpClient _httpClient;
-    private HttpClientHandler _httpClientHandler;
+    protected HttpClient _httpClient;
+    protected HttpClientHandler _httpClientHandler;
 
     private string MediaType => "application/json";
 
@@ -950,7 +950,7 @@ public abstract class RestApiClient : IDisposable
         return response;
     }
 
-    private HttpClient InstanceHttpClient()
+    protected HttpClient InstanceHttpClient()
     {
         if (_httpClient is not null)
             return _httpClient;
