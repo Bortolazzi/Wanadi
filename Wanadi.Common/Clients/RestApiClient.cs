@@ -12,7 +12,7 @@ namespace Wanadi.Common.Clients;
 ///         en-US: Dynamic and abstract class that encapsulates GET, POST, PUT, PATCH and DELETE HTTP requests.
 ///     </para>
 /// </summary>
-public class RestApiClient
+public abstract class RestApiClient : IDisposable
 {
     /// <summary>
     ///     <para>
@@ -59,6 +59,9 @@ public class RestApiClient
     ///     </para>
     /// </summary>
     protected bool IgnoreResponseDeserializeError { get; set; } = false;
+
+    private HttpClient _httpClient;
+    private HttpClientHandler _httpClientHandler;
 
     private string MediaType => "application/json";
 
@@ -949,19 +952,23 @@ public class RestApiClient
 
     private HttpClient InstanceHttpClient()
     {
+        if (_httpClient is not null)
+            return _httpClient;
+
         ContainerCookie = new CookieContainer();
 
-        HttpClientHandler httpClientHandler = new HttpClientHandler();
-        httpClientHandler.CookieContainer = ContainerCookie;
-        httpClientHandler.AllowAutoRedirect = AllowAutoRedirect;
+        _httpClientHandler = new HttpClientHandler();
+        _httpClientHandler.CookieContainer = ContainerCookie;
+        _httpClientHandler.AllowAutoRedirect = AllowAutoRedirect;
 
         if (AllowByPassCertificateCheck)
-            httpClientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+            _httpClientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
 
         if (Proxy != null)
-            httpClientHandler.Proxy = Proxy;
+            _httpClientHandler.Proxy = Proxy;
 
-        return new HttpClient(httpClientHandler);
+        _httpClient = new HttpClient(_httpClientHandler);
+        return _httpClient;
     }
 
     private Uri GetUriToRequest(string uri)
@@ -984,5 +991,11 @@ public class RestApiClient
             throw new Exception("Invalid uri.");
 
         return tryUri;
+    }
+
+    public void Dispose()
+    {
+        _httpClientHandler?.Dispose();
+        _httpClient?.Dispose();
     }
 }

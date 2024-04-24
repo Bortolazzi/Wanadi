@@ -435,7 +435,7 @@ public static class PostgreSqlWrapper
         return properties;
     }
 
-    private static async Task<List<PostgreSqlPropertyDataType>> GetResultFieldsAsync<TType>(NpgsqlDataReader dataReader) where TType : class
+    public static async Task<List<PostgreSqlPropertyDataType>> GetResultFieldsAsync<TType>(NpgsqlDataReader dataReader) where TType : class
     {
         var properties = typeof(TType).GetProperties().Select(t => new PostgreSqlPropertyDataType(t)).ToList();
         var columns = await dataReader.GetColumnSchemaAsync();
