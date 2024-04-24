@@ -4,7 +4,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<NoWarn>$(NoWarn);NU1803</NoWarn>
-		<Version>8.1.3</Version>
+		<Version>8.1.5</Version>
 		<Authors>Renato Bortolazzi Junior</Authors>
 		<PackageDescription>Funcionalidades comuns utilizadas em projetos e no Wanadi.MySql.</PackageDescription>
 		<RepositoryUrl>https://github.com/Bortolazzi/Wanadi</RepositoryUrl>

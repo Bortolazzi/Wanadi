@@ -66,7 +66,7 @@ public abstract class RestApiClient : IDisposable
     private string MediaType => "application/json";
 
     private Uri? BaseUri { get; set; }
-    private CookieContainer? ContainerCookie { get; set; }
+    protected CookieContainer? ContainerCookie { get; set; }
     private WebProxy? Proxy { get; set; }
 
     public RestApiClient() : this(Encoding.UTF8) { }
@@ -924,7 +924,7 @@ public abstract class RestApiClient : IDisposable
         object? body,
         Dictionary<string, string>? headers)
     {
-        using (var _client = InstanceHttpClient())
+        var _client = InstanceHttpClient();
         using (var _message = BuildRequestMessage(fullUriOrPathUri, httpMethod, body, headers))
             return await _client.SendAsync(_message);
     }
