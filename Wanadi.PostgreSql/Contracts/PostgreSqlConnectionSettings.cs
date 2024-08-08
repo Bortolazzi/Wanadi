@@ -10,4 +10,6 @@ public class PostgreSqlConnectionSettings
     public int? CommandTimeout { get; set; } = 30;
     public int? CancellationTimeout { get; set; } = 2000;
     public int? MaxPoolSize { get; set; } = 5000;
+    public int? KeepAlive { get; set; } = 0;
+    public bool? IncludeErrorDetail { get; set; } = false;
 }

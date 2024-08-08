@@ -14,6 +14,8 @@ namespace Wanadi.Common.Clients;
 /// </summary>
 public abstract class RestApiClient : IDisposable
 {
+    protected TimeSpan Timeout { get; set; }
+
     /// <summary>
     ///     <para>
     ///         pt-BR: Encoding a ser utilizado na escrita e leitura dos corpos das mensagens.
@@ -126,6 +128,9 @@ public abstract class RestApiClient : IDisposable
 
     protected void SetWebProxy(WebProxy proxy)
         => Proxy = proxy;
+
+    protected void SetTimeout(TimeSpan timeout)
+        => Timeout = timeout;
 
     #region [GET]
 
@@ -952,14 +957,16 @@ public abstract class RestApiClient : IDisposable
 
     protected HttpClient InstanceHttpClient()
     {
-        if (_httpClient is not null)
+        if (_httpClient != null && _httpClient.Timeout == Timeout)
             return _httpClient;
 
         ContainerCookie = new CookieContainer();
 
-        _httpClientHandler = new HttpClientHandler();
-        _httpClientHandler.CookieContainer = ContainerCookie;
-        _httpClientHandler.AllowAutoRedirect = AllowAutoRedirect;
+        _httpClientHandler = new HttpClientHandler()
+        {
+            CookieContainer = ContainerCookie,
+            AllowAutoRedirect = AllowAutoRedirect
+        };
 
         if (AllowByPassCertificateCheck)
             _httpClientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };

@@ -2,3 +2,4 @@
 global using System.Text;
 global using Wanadi.Common.Extensions;
 global using Wanadi.Common.Helpers;
+global using Wanadi.Common.Enums;

@@ -4,9 +4,9 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<NoWarn>$(NoWarn);NU1803</NoWarn>
-		<Version>8.1.5</Version>
+		<Version>8.1.7</Version>
 		<Authors>Renato Bortolazzi Junior</Authors>
-		<PackageDescription>Funcionalidades comuns utilizadas em projetos e no Wanadi.MySql.</PackageDescription>
+		<PackageDescription>Funcionalidades comuns utilizadas em projetos e nos Pacotes Wanadi.</PackageDescription>
 		<RepositoryUrl>https://github.com/Bortolazzi/Wanadi</RepositoryUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
@@ -17,5 +17,6 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.ProgramSynthesis.Detection" Version="8.32.0" />
 		<PackageReference Include="Microsoft.Extensions.Primitives" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
 	</ItemGroup>
 </Project>

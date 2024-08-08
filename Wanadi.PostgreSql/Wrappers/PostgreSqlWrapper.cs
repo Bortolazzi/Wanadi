@@ -11,7 +11,18 @@ public static class PostgreSqlWrapper
     #region [ConnectionString]
 
     public static string BuildConnectionString(PostgreSqlConnectionSettings settings, string database)
-        => BuildConnectionString(settings.Host, settings.Username, settings.Password, database, settings.Port, settings.Timeout, settings.CommandTimeout, settings.MaxPoolSize, settings.CancellationTimeout);
+        => BuildConnectionString(
+            settings.Host,
+            settings.Username,
+            settings.Password,
+            database,
+            settings.Port,
+            settings.Timeout,
+            settings.CommandTimeout,
+            settings.MaxPoolSize,
+            settings.CancellationTimeout,
+            settings.KeepAlive,
+            settings.IncludeErrorDetail);
 
     public static string BuildConnectionString(
         string host,
@@ -22,7 +33,9 @@ public static class PostgreSqlWrapper
         int? timeout = 15,
         int? commandTimeout = 30,
         int? maxPoolSize = 5000,
-        int? cancellationTimeout = 2000)
+        int? cancellationTimeout = 2000,
+        int? keepAlive = 0,
+        bool? includeErrorDetail = false)
     {
         var builder = new NpgsqlConnectionStringBuilder()
         {
@@ -35,9 +48,10 @@ public static class PostgreSqlWrapper
             CommandTimeout = commandTimeout ?? 30,
             Database = database,
             PersistSecurityInfo = true,
-
+            KeepAlive = keepAlive ?? 0,
             MaxPoolSize = maxPoolSize ?? 5000,
-            CancellationTimeout = cancellationTimeout ?? 2000
+            CancellationTimeout = cancellationTimeout ?? 2000,
+            IncludeErrorDetail = includeErrorDetail ?? false
         };
 
         return builder.ConnectionString;
@@ -412,7 +426,7 @@ public static class PostgreSqlWrapper
                         await binaryImporter.WriteNullAsync();
                         continue;
                     }
-                    
+
                     await binaryImporter.WriteAsync(value, property.PostgreSqlType);
                 }
             }
