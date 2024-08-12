@@ -14,7 +14,7 @@ namespace Wanadi.Common.Clients;
 /// </summary>
 public abstract class RestApiClient : IDisposable
 {
-    protected TimeSpan Timeout { get; set; }
+    protected TimeSpan? Timeout { get; set; }
 
     /// <summary>
     ///     <para>
@@ -971,10 +971,14 @@ public abstract class RestApiClient : IDisposable
         if (AllowByPassCertificateCheck)
             _httpClientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
 
-        if (Proxy != null)
+        if (Proxy is not null)
             _httpClientHandler.Proxy = Proxy;
 
         _httpClient = new HttpClient(_httpClientHandler);
+        
+        if (Timeout is not null)
+            _httpClient.Timeout = Timeout.Value;
+
         return _httpClient;
     }
 
