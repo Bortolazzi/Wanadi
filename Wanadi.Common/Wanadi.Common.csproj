@@ -4,7 +4,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<NoWarn>$(NoWarn);NU1803</NoWarn>
-		<Version>8.1.8</Version>
+		<Version>8.2.0</Version>
 		<Authors>Renato Bortolazzi Junior</Authors>
 		<PackageDescription>Funcionalidades comuns utilizadas em projetos e nos Pacotes Wanadi.</PackageDescription>
 		<RepositoryUrl>https://github.com/Bortolazzi/Wanadi</RepositoryUrl>
@@ -18,5 +18,6 @@
 		<PackageReference Include="Microsoft.ProgramSynthesis.Detection" Version="8.32.0" />
 		<PackageReference Include="Microsoft.Extensions.Primitives" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+		<PackageReference Include="EPPlus" Version="7.2.2" />
 	</ItemGroup>
 </Project>
