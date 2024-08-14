@@ -9,7 +9,6 @@ public static class ExcelWrapper
 {
     private static string GetCellLetter(string addressMaxColunm, int row = 1)
     {
-        //Recuperamos as propriedades do objeto contido na lista a ser exportada
         string celulaFinalCabecalho = addressMaxColunm.Split(':')[1];
         return celulaFinalCabecalho.Replace(celulaFinalCabecalho.RemoveNotNumeric(), row.ToString());
     }
