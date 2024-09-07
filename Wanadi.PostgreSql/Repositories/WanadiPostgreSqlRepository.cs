@@ -20,7 +20,7 @@ public abstract class WanadiPostgreSqlRepository<TEntity> : IWanadiPostgreSqlRep
     public string GetTableName()
         => typeof(TEntity).GetTableName();
 
-    public async Task<TEntity?> AddAsync(TEntity entity)
+    public async Task<TEntity?> AddAsync(TEntity entity, string? tableName = null)
     {
         if (entity is null)
             return null;
@@ -28,7 +28,9 @@ public abstract class WanadiPostgreSqlRepository<TEntity> : IWanadiPostgreSqlRep
         if (entity == default(TEntity))
             return null;
 
-        var properties = await PostgreSqlWrapper.MapPropertiesAsync<TEntity>(await GetConnectionAsync(), GetTableName());
+        tableName = tableName ?? GetTableName();
+
+        var properties = await PostgreSqlWrapper.MapPropertiesAsync<TEntity>(await GetConnectionAsync(), tableName);
 
         if (properties.Count(t => t.HasKeyAttribute) == 0)
             throw new Exception($"Entity does not have an identifier defined in the properties. (KeyAttribute)");
@@ -58,7 +60,7 @@ public abstract class WanadiPostgreSqlRepository<TEntity> : IWanadiPostgreSqlRep
             parameters.Add(parameterToAdd);
         }
 
-        var commandToExecute = $"INSERT INTO {GetTableName()} ({string.Join(", ", properties.Select(t => t.ColumnName).ToList())}) VALUES ({string.Join(", ", properties.Select(t => $"@{t.ColumnName}").ToList())}) returning {identifier.ColumnName};";
+        var commandToExecute = $"INSERT INTO {tableName} ({string.Join(", ", properties.Select(t => t.ColumnName).ToList())}) VALUES ({string.Join(", ", properties.Select(t => $"@{t.ColumnName}").ToList())}) returning {identifier.ColumnName};";
 
         var idValue = await PostgreSqlWrapper.ExecuteScalarAsync(await GetConnectionAsync(), commandToExecute, parameters);
 
@@ -73,7 +75,7 @@ public abstract class WanadiPostgreSqlRepository<TEntity> : IWanadiPostgreSqlRep
     public async Task DeleteByIdAsync(int id)
         => await ExecuteNonQueryAsync($"DELETE FROM {GetTableName()} WHERE id = {id};");
 
-    public async Task UpdateAsync(TEntity entity)
+    public async Task UpdateAsync(TEntity entity, string? tableName = null)
     {
         if (entity is null)
             return;
@@ -81,7 +83,9 @@ public abstract class WanadiPostgreSqlRepository<TEntity> : IWanadiPostgreSqlRep
         if (entity == default(TEntity))
             return;
 
-        var properties = await PostgreSqlWrapper.MapPropertiesAsync<TEntity>(await GetConnectionAsync(), GetTableName());
+        tableName = tableName ?? GetTableName();
+
+        var properties = await PostgreSqlWrapper.MapPropertiesAsync<TEntity>(await GetConnectionAsync(), tableName);
 
         if (properties.Count(t => t.HasKeyAttribute) == 0)
             throw new Exception($"Entity does not have an identifier defined in the properties. (KeyAttribute)");
@@ -116,7 +120,7 @@ public abstract class WanadiPostgreSqlRepository<TEntity> : IWanadiPostgreSqlRep
             parameters.Add(parameterToAdd);
         }
 
-        var commandToExecute = $"UPDATE {GetTableName()} SET {string.Join(", ", properties.Select(t => $"{t.ColumnName} = @{t.ColumnName}").ToList())} WHERE {identifier.ColumnName} = @{identifier.ColumnName};";
+        var commandToExecute = $"UPDATE {tableName} SET {string.Join(", ", properties.Select(t => $"{t.ColumnName} = @{t.ColumnName}").ToList())} WHERE {identifier.ColumnName} = @{identifier.ColumnName};";
         await PostgreSqlWrapper.ExecuteNonQueryAsync(await GetConnectionAsync(), commandToExecute, parameters);
     }
 

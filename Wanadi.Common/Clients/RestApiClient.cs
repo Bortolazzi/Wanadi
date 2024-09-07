@@ -945,7 +945,7 @@ public abstract class RestApiClient : IDisposable
         if (headers != null && headers.Count > 0)
         {
             foreach (var header in headers)
-                response.Headers.Add(header.Key, header.Value);
+                response.Headers.TryAddWithoutValidation(header.Key, header.Value);
         }
 
         if (httpMethod == HttpMethod.Get || body == null)
