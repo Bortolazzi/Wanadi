@@ -12,6 +12,6 @@
     <ProjectReference Include="..\Wanadi.MySql\Wanadi.MySql.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="MySql.EntityFrameworkCore" Version="8.0.0" />
+    <PackageReference Include="MySql.EntityFrameworkCore" Version="8.0.8" />
   </ItemGroup>
 </Project>

@@ -195,10 +195,10 @@ public static class ExcelWrapper
         }
     }
 
-    public static void ListToFile<T>(string fileName, List<T> sourceData, string worksheetName, bool reviewStyleCell)
-        => ListToFile<T>(fileName, sourceData, worksheetName, reviewStyleCell, null);
+    public static async Task ListToFileAsync<T>(string fileName, List<T> sourceData, string worksheetName, bool reviewStyleCell)
+        => await ListToFileAsync<T>(fileName, sourceData, worksheetName, reviewStyleCell, null);
 
-    public static void ListToFile<T>(string fileName, List<T> sourceData, string worksheetName, bool reviewStyleCell, List<ExcelWrapperColumnNickname>? columnsNickname, params int[] columnsRemove)
+    public static async Task ListToFileAsync<T>(string fileName, List<T> sourceData, string worksheetName, bool reviewStyleCell, List<ExcelWrapperColumnNickname>? columnsNickname, params int[] columnsRemove)
     {
         FileInfo fileInfo = new FileInfo(fileName);
         ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -231,7 +231,13 @@ public static class ExcelWrapper
             ExcelWrapper.ApplyNicknames(worksheet, columnsNickname);
             worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
 
-            excelPackage.Save();
+            await excelPackage.SaveAsync();
         }
     }
+
+    public static async Task ExportToExcelAsync<T>(this List<T> sourceData, string fileName, string worksheetName, bool reviewStyleCell)
+        => await ListToFileAsync<T>(fileName, sourceData, worksheetName, reviewStyleCell, null);
+
+    public static async Task ExportToExcelAsync<T>(this List<T> sourceData, string fileName, string worksheetName, bool reviewStyleCell, List<ExcelWrapperColumnNickname>? columnsNickname, params int[] columnsRemove)
+        => await ListToFileAsync<T>(fileName, sourceData, worksheetName, reviewStyleCell, columnsNickname, columnsRemove);
 }

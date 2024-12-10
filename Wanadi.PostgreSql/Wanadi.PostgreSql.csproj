@@ -4,7 +4,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<NoWarn>$(NoWarn);NU1803</NoWarn>
-		<Version>8.1.0</Version>
+		<Version>8.2.0</Version>
 		<Authors>Renato Bortolazzi Junior</Authors>
 		<PackageDescription>Funcionalidades para facilitar execução de operações em PostgreSql com .net core.</PackageDescription>
 		<RepositoryUrl>https://github.com/Bortolazzi/Wanadi</RepositoryUrl>
@@ -18,6 +18,6 @@
 		<ProjectReference Include="..\Wanadi.Common\Wanadi.Common.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Npgsql" Version="8.0.3" />
+		<PackageReference Include="Npgsql" Version="9.0.2" />
 	</ItemGroup>
 </Project>
