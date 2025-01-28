@@ -206,6 +206,7 @@ public static class ExcelWrapper
         using (ExcelPackage excelPackage = new ExcelPackage(fileInfo))
         {
             ExcelWorksheet worksheet = excelPackage.Workbook.Worksheets.Add(worksheetName);
+            worksheet.Cells["A1"].LoadFromCollection(sourceData, true);
 
             worksheet.Cells.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             worksheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
@@ -213,8 +214,6 @@ public static class ExcelWrapper
             worksheet.Cells.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.White);
             worksheet.Cells.Style.Font.Name = "Courier New";
             worksheet.Cells.Style.Font.Size = 12;
-
-            worksheet.Cells["A1"].LoadFromCollection(sourceData, true);
 
             if (columnsRemove != null && columnsRemove.Length > 0)
             {
