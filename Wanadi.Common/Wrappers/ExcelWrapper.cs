@@ -1,3 +1,5 @@
+using System.Data;
+using System.Drawing;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using Wanadi.Common.Attributes;
@@ -7,6 +9,12 @@ namespace Wanadi.Common.Wrappers;
 
 public static class ExcelWrapper
 {
+    public static Color HeaderBackgroundColor { get; set; } = Color.Purple;
+    public static Color HeaderFontColor { get; set; } = Color.White;
+    public static string FontName { get; set; } = "Courier New";
+    public static float FontSize { get; set; } = 12;
+
+
     private static string GetCellLetter(string addressMaxColunm, int row = 1)
     {
         string celulaFinalCabecalho = addressMaxColunm.Split(':')[1];
@@ -105,8 +113,8 @@ public static class ExcelWrapper
     {
         worksheet.Cells[$"{firstCell}:{lastCell}"].Style.Font.Bold = true;
         worksheet.Cells[$"{firstCell}:{lastCell}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
-        worksheet.Cells[$"{firstCell}:{lastCell}"].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.Purple);
-        worksheet.Cells[$"{firstCell}:{lastCell}"].Style.Font.Color.SetColor(System.Drawing.Color.White);
+        worksheet.Cells[$"{firstCell}:{lastCell}"].Style.Fill.BackgroundColor.SetColor(ExcelWrapper.HeaderBackgroundColor);
+        worksheet.Cells[$"{firstCell}:{lastCell}"].Style.Font.Color.SetColor(ExcelWrapper.HeaderFontColor);
     }
 
     private static void ApplyNicknames(ExcelWorksheet worksheet, List<ExcelWrapperColumnNickname> columnsNickname)
@@ -211,9 +219,48 @@ public static class ExcelWrapper
             worksheet.Cells.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             worksheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             worksheet.Cells.Style.Fill.PatternType = ExcelFillStyle.Solid;
-            worksheet.Cells.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.White);
-            worksheet.Cells.Style.Font.Name = "Courier New";
-            worksheet.Cells.Style.Font.Size = 12;
+            worksheet.Cells.Style.Fill.BackgroundColor.SetColor(Color.White);
+            worksheet.Cells.Style.Font.Name = ExcelWrapper.FontName;
+            worksheet.Cells.Style.Font.Size = ExcelWrapper.FontSize;
+
+            if (columnsRemove != null && columnsRemove.Length > 0)
+            {
+                foreach (var columnDelete in columnsRemove.OrderByDescending(t => t))
+                    worksheet.DeleteColumn(columnDelete);
+            }
+
+            string lastCell = ExcelWrapper.GetCellLetter(worksheet.Dimension.Address, 1);
+
+            if (reviewStyleCell)
+                ExcelWrapper.FormatStyleCells(worksheet);
+
+            ExcelWrapper.FormatHeader(worksheet, "A1", lastCell);
+            ExcelWrapper.ApplyNicknames(worksheet, columnsNickname);
+            worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
+            await excelPackage.SaveAsync();
+        }
+    }
+
+    public static async Task DataTableToFileAsync(string fileName, DataTable sourceData, string worksheetName, bool reviewStyleCell)
+        => await DataTableToFileAsync(fileName, sourceData, worksheetName, reviewStyleCell, null);
+
+    public static async Task DataTableToFileAsync(string fileName, DataTable sourceData, string worksheetName, bool reviewStyleCell, List<ExcelWrapperColumnNickname>? columnsNickname, params int[] columnsRemove)
+    {
+        FileInfo fileInfo = new FileInfo(fileName);
+        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+        using (ExcelPackage excelPackage = new ExcelPackage(fileInfo))
+        {
+            ExcelWorksheet worksheet = excelPackage.Workbook.Worksheets.Add(worksheetName);
+            worksheet.Cells["A1"].LoadFromDataTable(sourceData, true);
+
+            worksheet.Cells.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            worksheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            worksheet.Cells.Style.Fill.PatternType = ExcelFillStyle.Solid;
+            worksheet.Cells.Style.Fill.BackgroundColor.SetColor(Color.White);
+            worksheet.Cells.Style.Font.Name = ExcelWrapper.FontName;
+            worksheet.Cells.Style.Font.Size = ExcelWrapper.FontSize;
 
             if (columnsRemove != null && columnsRemove.Length > 0)
             {
@@ -239,4 +286,10 @@ public static class ExcelWrapper
 
     public static async Task ExportToExcelAsync<T>(this List<T> sourceData, string fileName, string worksheetName, bool reviewStyleCell, List<ExcelWrapperColumnNickname>? columnsNickname, params int[] columnsRemove)
         => await ListToFileAsync<T>(fileName, sourceData, worksheetName, reviewStyleCell, columnsNickname, columnsRemove);
+
+    public static async Task ExportToExcelAsync(this DataTable sourceData, string fileName, string worksheetName, bool reviewStyleCell)
+        => await DataTableToFileAsync(fileName, sourceData, worksheetName, reviewStyleCell);
+
+    public static async Task ExportToExcelAsync(this DataTable sourceData, string fileName, string worksheetName, bool reviewStyleCell, List<ExcelWrapperColumnNickname>? columnsNickname, params int[] columnsRemove)
+        => await DataTableToFileAsync(fileName, sourceData, worksheetName, reviewStyleCell, columnsNickname, columnsRemove);
 }
