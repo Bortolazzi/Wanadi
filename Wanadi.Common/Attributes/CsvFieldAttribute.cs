@@ -58,7 +58,7 @@ public class CsvFieldAttribute : Attribute
         if (index < 0)
             throw new IndexOutOfRangeException($"Zero-based index cannot be less than zero. Index: {index}");
 
-        Index = 0;
+        Index = index;
         TypeToConvert = typeToConvert;
         RemoveStartAndEndQuotes = removeStartAndEndQuotes;
 
