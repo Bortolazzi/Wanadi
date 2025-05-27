@@ -22,7 +22,7 @@ public abstract class RestApiClient : IDisposable
     ///         en-US: Encoding to be used when writing and reading message bodies.
     ///     </para>
     /// </summary>
-    protected Encoding ResponseEncoding { get; set; }
+    protected Encoding DefaultEncoding { get; set; }
 
     /// <summary>
     ///     <para>
@@ -49,9 +49,9 @@ public abstract class RestApiClient : IDisposable
 
     public RestApiClient(IHttpClientFactory _httpClientFactory, CookieContainer cookieContainer, string? httpClientName = null) : this(_httpClientFactory, cookieContainer, Encoding.UTF8, httpClientName) { }
 
-    public RestApiClient(IHttpClientFactory _httpClientFactory, CookieContainer cookieContainer, Encoding responseEncoding, string? httpClientName = null)
+    public RestApiClient(IHttpClientFactory _httpClientFactory, CookieContainer cookieContainer, Encoding defaultEncoding, string? httpClientName = null)
     {
-        ResponseEncoding = responseEncoding;
+        DefaultEncoding = defaultEncoding;
         _cookieContainer = cookieContainer;
         _httpClient = httpClientName is not { Length: > 0 } ? _httpClientFactory.CreateClient() : _httpClientFactory.CreateClient(httpClientName);
     }
@@ -133,8 +133,8 @@ public abstract class RestApiClient : IDisposable
     ///         en-US: Object containing the request response information.
     ///     </para>
     /// </returns>
-    protected virtual async Task<RestApiResponse> GetAsync(string fullUriOrPathUri, Dictionary<string, string>? headers = null, CancellationToken cancellationToken = default)
-        => await SendAndParseResponseAsync(fullUriOrPathUri, HttpMethod.Get, null, headers, cancellationToken);
+    protected virtual async Task<RestApiResponse> GetAsync(string fullUriOrPathUri, Dictionary<string, string>? headers = null, Encoding? encoding = null, CancellationToken cancellationToken = default)
+        => await SendAndParseResponseAsync(fullUriOrPathUri, HttpMethod.Get, null, headers, encoding, cancellationToken);
 
     /// <summary>
     ///     <para>
@@ -176,8 +176,8 @@ public abstract class RestApiClient : IDisposable
     ///         en-US: Object containing the request response information. Deserializing Content in TResponse.
     ///     </para>
     /// </returns>
-    protected virtual async Task<RestApiResponse<TResponse>> GetAsync<TResponse>(string fullUriOrPathUri, Dictionary<string, string>? headers = null, CancellationToken cancellationToken = default) where TResponse : class
-        => await SendAndParseResponseAsync<TResponse>(fullUriOrPathUri, HttpMethod.Get, null, headers, cancellationToken);
+    protected virtual async Task<RestApiResponse<TResponse>> GetAsync<TResponse>(string fullUriOrPathUri, Dictionary<string, string>? headers = null, Encoding? encoding = null, CancellationToken cancellationToken = default) where TResponse : class
+        => await SendAndParseResponseAsync<TResponse>(fullUriOrPathUri, HttpMethod.Get, null, headers, encoding, cancellationToken);
 
     /// <summary>
     ///     <para>
@@ -227,8 +227,8 @@ public abstract class RestApiClient : IDisposable
     ///         en-US: Object containing the request response information. Deserializing Content into TResponse when successful and deserializing Content into TError when failed.
     ///     </para>
     /// </returns>
-    protected virtual async Task<RestApiResponse<TResponse, TError>> GetAsync<TResponse, TError>(string fullUriOrPathUri, Dictionary<string, string>? headers = null, CancellationToken cancellationToken = default) where TResponse : class where TError : class
-        => await SendAndParseResponseAsync<TResponse, TError>(fullUriOrPathUri, HttpMethod.Get, null, headers, cancellationToken);
+    protected virtual async Task<RestApiResponse<TResponse, TError>> GetAsync<TResponse, TError>(string fullUriOrPathUri, Dictionary<string, string>? headers = null, Encoding? encoding = null, CancellationToken cancellationToken = default) where TResponse : class where TError : class
+        => await SendAndParseResponseAsync<TResponse, TError>(fullUriOrPathUri, HttpMethod.Get, null, headers, encoding, cancellationToken);
 
     #endregion [GET]
 
@@ -274,8 +274,8 @@ public abstract class RestApiClient : IDisposable
     ///         en-US: Object containing the request response information.
     ///     </para>
     /// </returns>
-    protected virtual async Task<RestApiResponse> PostAsync(string fullUriOrPathUri, object? body, Dictionary<string, string>? headers = null, CancellationToken cancellationToken = default)
-        => await SendAndParseResponseAsync(fullUriOrPathUri, HttpMethod.Post, body, headers, cancellationToken);
+    protected virtual async Task<RestApiResponse> PostAsync(string fullUriOrPathUri, object? body, Dictionary<string, string>? headers = null, Encoding? encoding = null, CancellationToken cancellationToken = default)
+        => await SendAndParseResponseAsync(fullUriOrPathUri, HttpMethod.Post, body, headers, encoding, cancellationToken);
 
     /// <summary>
     ///     <para>
@@ -325,8 +325,8 @@ public abstract class RestApiClient : IDisposable
     ///         en-US: Object containing the request response information. Deserializing Content in TResponse.
     ///     </para>
     /// </returns>
-    protected virtual async Task<RestApiResponse<TResponse>> PostAsync<TResponse>(string fullUriOrPathUri, object? body, Dictionary<string, string>? headers = null, CancellationToken cancellationToken = default) where TResponse : class
-        => await SendAndParseResponseAsync<TResponse>(fullUriOrPathUri, HttpMethod.Post, body, headers, cancellationToken);
+    protected virtual async Task<RestApiResponse<TResponse>> PostAsync<TResponse>(string fullUriOrPathUri, object? body, Dictionary<string, string>? headers = null, Encoding? encoding = null, CancellationToken cancellationToken = default) where TResponse : class
+        => await SendAndParseResponseAsync<TResponse>(fullUriOrPathUri, HttpMethod.Post, body, headers, encoding, cancellationToken);
 
     /// <summary>
     ///     <para>
@@ -384,8 +384,8 @@ public abstract class RestApiClient : IDisposable
     ///         en-US: Object containing the request response information. Deserializing Content into TResponse when successful and deserializing Content into TError when failed.
     ///     </para>
     /// </returns>
-    protected virtual async Task<RestApiResponse<TResponse, TError>> PostAsync<TResponse, TError>(string fullUriOrPathUri, object? body, Dictionary<string, string>? headers = null, CancellationToken cancellationToken = default) where TResponse : class where TError : class
-        => await SendAndParseResponseAsync<TResponse, TError>(fullUriOrPathUri, HttpMethod.Post, body, headers, cancellationToken);
+    protected virtual async Task<RestApiResponse<TResponse, TError>> PostAsync<TResponse, TError>(string fullUriOrPathUri, object? body, Dictionary<string, string>? headers = null, Encoding? encoding = null, CancellationToken cancellationToken = default) where TResponse : class where TError : class
+        => await SendAndParseResponseAsync<TResponse, TError>(fullUriOrPathUri, HttpMethod.Post, body, headers, encoding, cancellationToken);
 
     #endregion [POST]
 
@@ -431,8 +431,8 @@ public abstract class RestApiClient : IDisposable
     ///         en-US: Object containing the request response information.
     ///     </para>
     /// </returns>
-    protected virtual async Task<RestApiResponse> DeleteAsync(string fullUriOrPathUri, object? body, Dictionary<string, string>? headers = null, CancellationToken cancellationToken = default)
-        => await SendAndParseResponseAsync(fullUriOrPathUri, HttpMethod.Delete, body, headers, cancellationToken);
+    protected virtual async Task<RestApiResponse> DeleteAsync(string fullUriOrPathUri, object? body, Dictionary<string, string>? headers = null, Encoding? encoding = null, CancellationToken cancellationToken = default)
+        => await SendAndParseResponseAsync(fullUriOrPathUri, HttpMethod.Delete, body, headers, encoding, cancellationToken);
 
     /// <summary>
     ///     <para>
@@ -482,8 +482,8 @@ public abstract class RestApiClient : IDisposable
     ///         en-US: Object containing the request response information. Deserializing Content in TResponse.
     ///     </para>
     /// </returns>
-    protected virtual async Task<RestApiResponse<TResponse>> DeleteAsync<TResponse>(string fullUriOrPathUri, object? body, Dictionary<string, string>? headers = null, CancellationToken cancellationToken = default) where TResponse : class
-        => await SendAndParseResponseAsync<TResponse>(fullUriOrPathUri, HttpMethod.Delete, body, headers, cancellationToken);
+    protected virtual async Task<RestApiResponse<TResponse>> DeleteAsync<TResponse>(string fullUriOrPathUri, object? body, Dictionary<string, string>? headers = null, Encoding? encoding = null, CancellationToken cancellationToken = default) where TResponse : class
+        => await SendAndParseResponseAsync<TResponse>(fullUriOrPathUri, HttpMethod.Delete, body, headers, encoding, cancellationToken);
 
     /// <summary>
     ///     <para>
@@ -541,8 +541,8 @@ public abstract class RestApiClient : IDisposable
     ///         en-US: Object containing the request response information. Deserializing Content into TResponse when successful and deserializing Content into TError when failed.
     ///     </para>
     /// </returns>
-    protected virtual async Task<RestApiResponse<TResponse, TError>> DeleteAsync<TResponse, TError>(string fullUriOrPathUri, object? body, Dictionary<string, string>? headers = null, CancellationToken cancellationToken = default) where TResponse : class where TError : class
-        => await SendAndParseResponseAsync<TResponse, TError>(fullUriOrPathUri, HttpMethod.Delete, body, headers, cancellationToken);
+    protected virtual async Task<RestApiResponse<TResponse, TError>> DeleteAsync<TResponse, TError>(string fullUriOrPathUri, object? body, Dictionary<string, string>? headers = null, Encoding? encoding = null, CancellationToken cancellationToken = default) where TResponse : class where TError : class
+        => await SendAndParseResponseAsync<TResponse, TError>(fullUriOrPathUri, HttpMethod.Delete, body, headers, encoding, cancellationToken);
 
     #endregion [DELETE]
 
@@ -588,8 +588,8 @@ public abstract class RestApiClient : IDisposable
     ///         en-US: Object containing the request response information.
     ///     </para>
     /// </returns>
-    protected virtual async Task<RestApiResponse> PatchAsync(string fullUriOrPathUri, object? body, Dictionary<string, string>? headers = null, CancellationToken cancellationToken = default)
-        => await SendAndParseResponseAsync(fullUriOrPathUri, HttpMethod.Patch, body, headers, cancellationToken);
+    protected virtual async Task<RestApiResponse> PatchAsync(string fullUriOrPathUri, object? body, Dictionary<string, string>? headers = null, Encoding? encoding = null, CancellationToken cancellationToken = default)
+        => await SendAndParseResponseAsync(fullUriOrPathUri, HttpMethod.Patch, body, headers, encoding, cancellationToken);
 
     /// <summary>
     ///     <para>
@@ -639,8 +639,8 @@ public abstract class RestApiClient : IDisposable
     ///         en-US: Object containing the request response information. Deserializing Content in TResponse.
     ///     </para>
     /// </returns>
-    protected virtual async Task<RestApiResponse<TResponse>> PatchAsync<TResponse>(string fullUriOrPathUri, object? body, Dictionary<string, string>? headers = null, CancellationToken cancellationToken = default) where TResponse : class
-        => await SendAndParseResponseAsync<TResponse>(fullUriOrPathUri, HttpMethod.Patch, body, headers, cancellationToken);
+    protected virtual async Task<RestApiResponse<TResponse>> PatchAsync<TResponse>(string fullUriOrPathUri, object? body, Dictionary<string, string>? headers = null, Encoding? encoding = null, CancellationToken cancellationToken = default) where TResponse : class
+        => await SendAndParseResponseAsync<TResponse>(fullUriOrPathUri, HttpMethod.Patch, body, headers, encoding, cancellationToken);
 
     /// <summary>
     ///     <para>
@@ -698,8 +698,8 @@ public abstract class RestApiClient : IDisposable
     ///         en-US: Object containing the request response information. Deserializing Content into TResponse when successful and deserializing Content into TError when failed.
     ///     </para>
     /// </returns>
-    protected virtual async Task<RestApiResponse<TResponse, TError>> PatchAsync<TResponse, TError>(string fullUriOrPathUri, object? body, Dictionary<string, string>? headers = null, CancellationToken cancellationToken = default) where TResponse : class where TError : class
-        => await SendAndParseResponseAsync<TResponse, TError>(fullUriOrPathUri, HttpMethod.Patch, body, headers, cancellationToken);
+    protected virtual async Task<RestApiResponse<TResponse, TError>> PatchAsync<TResponse, TError>(string fullUriOrPathUri, object? body, Dictionary<string, string>? headers = null, Encoding? encoding = null, CancellationToken cancellationToken = default) where TResponse : class where TError : class
+        => await SendAndParseResponseAsync<TResponse, TError>(fullUriOrPathUri, HttpMethod.Patch, body, headers, encoding, cancellationToken);
 
     #endregion [PATCH]
 
@@ -745,8 +745,8 @@ public abstract class RestApiClient : IDisposable
     ///         en-US: Object containing the request response information.
     ///     </para>
     /// </returns>
-    protected virtual async Task<RestApiResponse> PutAsync(string fullUriOrPathUri, object? body, Dictionary<string, string>? headers = null, CancellationToken cancellationToken = default)
-        => await SendAndParseResponseAsync(fullUriOrPathUri, HttpMethod.Put, body, headers, cancellationToken);
+    protected virtual async Task<RestApiResponse> PutAsync(string fullUriOrPathUri, object? body, Dictionary<string, string>? headers = null, Encoding? encoding = null, CancellationToken cancellationToken = default)
+        => await SendAndParseResponseAsync(fullUriOrPathUri, HttpMethod.Put, body, headers, encoding, cancellationToken);
 
     /// <summary>
     ///     <para>
@@ -796,8 +796,8 @@ public abstract class RestApiClient : IDisposable
     ///         en-US: Object containing the request response information. Deserializing Content in TResponse.
     ///     </para>
     /// </returns>
-    protected virtual async Task<RestApiResponse<TResponse>> PutAsync<TResponse>(string fullUriOrPathUri, object? body, Dictionary<string, string>? headers = null, CancellationToken cancellationToken = default) where TResponse : class
-        => await SendAndParseResponseAsync<TResponse>(fullUriOrPathUri, HttpMethod.Put, body, headers, cancellationToken);
+    protected virtual async Task<RestApiResponse<TResponse>> PutAsync<TResponse>(string fullUriOrPathUri, object? body, Dictionary<string, string>? headers = null, Encoding? encoding = null, CancellationToken cancellationToken = default) where TResponse : class
+        => await SendAndParseResponseAsync<TResponse>(fullUriOrPathUri, HttpMethod.Put, body, headers, encoding, cancellationToken);
 
     /// <summary>
     ///     <para>
@@ -855,8 +855,8 @@ public abstract class RestApiClient : IDisposable
     ///         en-US: Object containing the request response information. Deserializing Content into TResponse when successful and deserializing Content into TError when failed.
     ///     </para>
     /// </returns>
-    protected virtual async Task<RestApiResponse<TResponse, TError>> PutAsync<TResponse, TError>(string fullUriOrPathUri, object? body, Dictionary<string, string>? headers = null, CancellationToken cancellationToken = default) where TResponse : class where TError : class
-        => await SendAndParseResponseAsync<TResponse, TError>(fullUriOrPathUri, HttpMethod.Put, body, headers, cancellationToken);
+    protected virtual async Task<RestApiResponse<TResponse, TError>> PutAsync<TResponse, TError>(string fullUriOrPathUri, object? body, Dictionary<string, string>? headers = null, Encoding? encoding = null, CancellationToken cancellationToken = default) where TResponse : class where TError : class
+        => await SendAndParseResponseAsync<TResponse, TError>(fullUriOrPathUri, HttpMethod.Put, body, headers, encoding, cancellationToken);
 
     #endregion [PUT]
 
@@ -865,8 +865,8 @@ public abstract class RestApiClient : IDisposable
     protected virtual async Task<RestApiFileResponse> GetDownloadAsync(string fullUriOrPathUri, Dictionary<string, string>? headers = null, CancellationToken cancellationToken = default)
         => await SendAndDownloadResponseAsync(fullUriOrPathUri, HttpMethod.Get, null, headers, cancellationToken);
 
-     protected virtual async Task<RestApiFileResponse> PostDownloadAsync(string fullUriOrPathUri, object? body, Dictionary<string, string>? headers = null, CancellationToken cancellationToken = default)
-        => await SendAndDownloadResponseAsync(fullUriOrPathUri, HttpMethod.Post, body, headers, cancellationToken);
+    protected virtual async Task<RestApiFileResponse> PostDownloadAsync(string fullUriOrPathUri, object? body, Dictionary<string, string>? headers = null, CancellationToken cancellationToken = default)
+       => await SendAndDownloadResponseAsync(fullUriOrPathUri, HttpMethod.Post, body, headers, cancellationToken);
 
     #endregion [Download]
 
@@ -875,10 +875,11 @@ public abstract class RestApiClient : IDisposable
         HttpMethod httpMethod,
         object? body,
         Dictionary<string, string>? headers,
+        Encoding? encoding,
         CancellationToken cancellationToken)
     {
         using (var httpResponseMessage = await SendAsync(fullUriOrPathUri, httpMethod, body, headers, cancellationToken))
-            return await RestApiResponse.ReadResponseAsync(httpResponseMessage, ResponseEncoding, _cookieContainer, cancellationToken);
+            return await RestApiResponse.ReadResponseAsync(httpResponseMessage, encoding ?? DefaultEncoding, _cookieContainer, cancellationToken);
     }
 
     private async Task<RestApiResponse<TResponse>> SendAndParseResponseAsync<TResponse>(
@@ -886,10 +887,11 @@ public abstract class RestApiClient : IDisposable
         HttpMethod httpMethod,
         object? body,
         Dictionary<string, string>? headers,
+        Encoding? encoding,
         CancellationToken cancellationToken) where TResponse : class
     {
         using (var httpResponseMessage = await SendAsync(fullUriOrPathUri, httpMethod, body, headers, cancellationToken))
-            return await RestApiResponse<TResponse>.ReadResponseAsync(httpResponseMessage, ResponseEncoding, _cookieContainer, IgnoreResponseDeserializeError, cancellationToken);
+            return await RestApiResponse<TResponse>.ReadResponseAsync(httpResponseMessage, encoding ?? DefaultEncoding, _cookieContainer, IgnoreResponseDeserializeError, cancellationToken);
     }
 
     private async Task<RestApiResponse<TResponse, TError>> SendAndParseResponseAsync<TResponse, TError>(
@@ -897,10 +899,11 @@ public abstract class RestApiClient : IDisposable
         HttpMethod httpMethod,
         object? body,
         Dictionary<string, string>? headers,
+        Encoding? encoding,
         CancellationToken cancellationToken) where TResponse : class where TError : class
     {
         using (var httpResponseMessage = await SendAsync(fullUriOrPathUri, httpMethod, body, headers, cancellationToken))
-            return await RestApiResponse<TResponse, TError>.ReadResponseAsync(httpResponseMessage, ResponseEncoding, _cookieContainer, IgnoreResponseDeserializeError, cancellationToken);
+            return await RestApiResponse<TResponse, TError>.ReadResponseAsync(httpResponseMessage, encoding ?? DefaultEncoding, _cookieContainer, IgnoreResponseDeserializeError, cancellationToken);
     }
 
     private async Task<RestApiFileResponse> SendAndDownloadResponseAsync(
@@ -942,7 +945,7 @@ public abstract class RestApiClient : IDisposable
         if (httpMethod == HttpMethod.Get || body == null)
             return response;
 
-        response.Content = new StringContent(JsonConvert.SerializeObject(body), ResponseEncoding, MediaType);
+        response.Content = new StringContent(JsonConvert.SerializeObject(body), DefaultEncoding, MediaType);
         return response;
     }
 
