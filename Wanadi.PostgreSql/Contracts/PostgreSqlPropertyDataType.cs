@@ -5,7 +5,7 @@ using Wanadi.Common.Contracts.PropertyMappers;
 
 namespace Wanadi.PostgreSql.Contracts;
 
-public class PostgreSqlPropertyDataType : PropertyDataType
+public record PostgreSqlPropertyDataType : PropertyDataType
 {
     public PostgreSqlPropertyDataType(PropertyInfo propertyInfo) : base(propertyInfo)
     {

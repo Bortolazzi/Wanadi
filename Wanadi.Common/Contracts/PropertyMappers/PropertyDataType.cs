@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Wanadi.Common.Contracts.PropertyMappers;
 
-public class PropertyDataType
+public record PropertyDataType
 {
     public PropertyDataType(PropertyInfo property)
     {

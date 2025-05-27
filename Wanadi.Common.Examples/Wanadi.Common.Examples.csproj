@@ -9,4 +9,9 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Wanadi.Common\Wanadi.Common.csproj" />
 	</ItemGroup>
+	<ItemGroup>
+		<None Update="appsettings.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 </Project>

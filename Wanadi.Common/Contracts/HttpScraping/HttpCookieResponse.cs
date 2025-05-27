@@ -1,18 +1,10 @@
-﻿using System.Net;
+using System.Net;
 
-namespace Wanadi.Common.Contracts.RestApi;
+namespace Wanadi.Common.Contracts.HttpScraping;
 
-/// <summary>
-///     <para>
-///         pt-BR: Classe contendo os principais valores de um Cookie capturado pelo CookieContainer.
-///     </para>
-///     <para>
-///         en-US: Class containing the main values of a Cookie captured by the CookieContainer.
-///     </para>
-/// </summary>
-public sealed record RestApiCookieResponse
+public sealed record HttpCookieResponse
 {
-    public RestApiCookieResponse(Cookie cookie)
+    public HttpCookieResponse(Cookie cookie)
     {
         Path = cookie.Path;
         Value = cookie.Value;

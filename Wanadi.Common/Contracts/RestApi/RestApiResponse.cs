@@ -136,21 +136,21 @@ public class RestApiResponse
     ///         en-US: RestApiResponse object containing the request response data.
     ///     </para>
     /// </returns>
-    public static async Task<RestApiResponse> ReadResponseAsync(HttpResponseMessage httpResponseMessage, Encoding encoding, CookieContainer? cookieContainer)
+    public static async Task<RestApiResponse> ReadResponseAsync(HttpResponseMessage httpResponseMessage, Encoding encoding, CookieContainer? cookieContainer, CancellationToken cancellationToken = default)
     {
         var response = new RestApiResponse();
 
         response.StatusCode = httpResponseMessage.StatusCode;
         response.MediaType = httpResponseMessage.Content.Headers.ContentType?.MediaType;
         response.IsSuccessStatusCode = httpResponseMessage.IsSuccessStatusCode;
-        response.Content = await httpResponseMessage.ReadContentToStringAsync(encoding);
+        response.Content = await httpResponseMessage.ReadContentToStringAsync(encoding, cancellationToken);
 
         foreach (var header in httpResponseMessage.Headers)
             response.Headers.Add(header.Key, new StringValues(header.Value.ToArray()));
 
-        if (cookieContainer != null && cookieContainer.Count > 0)
+        if (cookieContainer is { Count: > 0 })
             response.Cookies.AddRange(cookieContainer.GetAllCookies().Select(t => new RestApiCookieResponse(t)).ToList());
-        
+
         return response;
     }
 }
@@ -228,9 +228,9 @@ public class RestApiResponse<TResponse> : RestApiResponse where TResponse : clas
     ///         en-US: RestApiResponse object containing the request response data.
     ///     </para>
     /// </returns>
-    public static async Task<RestApiResponse<TResponse>> ReadResponseAsync(HttpResponseMessage httpResponseMessage, Encoding encoding, CookieContainer? cookieContainer, bool ignoreResponseDeserializeError)
+    public static async Task<RestApiResponse<TResponse>> ReadResponseAsync(HttpResponseMessage httpResponseMessage, Encoding encoding, CookieContainer? cookieContainer, bool ignoreResponseDeserializeError, CancellationToken cancellationToken = default)
     {
-        var response = new RestApiResponse<TResponse>(await RestApiResponse.ReadResponseAsync(httpResponseMessage, encoding, cookieContainer));
+        var response = new RestApiResponse<TResponse>(await RestApiResponse.ReadResponseAsync(httpResponseMessage, encoding, cookieContainer, cancellationToken));
 
         if (response.IsSuccessStatusCode && !string.IsNullOrEmpty(response.Content))
         {
@@ -319,9 +319,9 @@ public class RestApiResponse<TResponse, TError> : RestApiResponse<TResponse> whe
     ///         en-US: RestApiResponse object containing the request response data.
     ///     </para>
     /// </returns>
-    public static new async Task<RestApiResponse<TResponse, TError>> ReadResponseAsync(HttpResponseMessage httpResponseMessage, Encoding encoding, CookieContainer? cookieContainer, bool ignoreResponseDeserializeError)
+    public static new async Task<RestApiResponse<TResponse, TError>> ReadResponseAsync(HttpResponseMessage httpResponseMessage, Encoding encoding, CookieContainer? cookieContainer, bool ignoreResponseDeserializeError, CancellationToken cancellationToken = default)
     {
-        var response = new RestApiResponse<TResponse, TError>(await RestApiResponse.ReadResponseAsync(httpResponseMessage, encoding, cookieContainer));
+        var response = new RestApiResponse<TResponse, TError>(await RestApiResponse.ReadResponseAsync(httpResponseMessage, encoding, cookieContainer, cancellationToken));
 
         if (!string.IsNullOrEmpty(response.Content))
         {
