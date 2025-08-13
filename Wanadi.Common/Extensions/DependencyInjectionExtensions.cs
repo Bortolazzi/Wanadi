@@ -55,29 +55,31 @@ public static class DependencyInjectionExtensions
 
         foreach (var httpClientConfig in httpClientConfigurations)
         {
-            var httpClientHandler = new HttpClientHandler()
-            {
-                AllowAutoRedirect = httpClientConfig.AllowAutoRedirect,
-                UseCookies = httpClientConfig.UseCookies
-            };
-
-            if (httpClientConfig.UseCookies)
-                httpClientHandler.CookieContainer = cookieContainer;
-
-            if (httpClientConfig.AllowByPassCertificateCheck)
-                httpClientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
-
-            if (httpClientConfig is { ProxyAddress: not null, ProxyPassword: not null, ProxyUser: not null })
-            {
-                var proxy = new WebProxy(httpClientConfig.ProxyAddress);
-                proxy.Credentials = new NetworkCredential(httpClientConfig.ProxyUser, httpClientConfig.ProxyPassword);
-                httpClientHandler.Proxy = proxy;
-            }
-
             services.AddHttpClient(httpClientConfig.Name, client =>
             {
                 client.Timeout = TimeSpan.FromSeconds(httpClientConfig.TimeoutSeconds.GetValueOrDefault(60));
-            }).ConfigurePrimaryHttpMessageHandler(() => httpClientHandler);
+            })
+            .ConfigurePrimaryHttpMessageHandler(_ =>
+            {
+                var handler = new HttpClientHandler
+                {
+                    AllowAutoRedirect = httpClientConfig.AllowAutoRedirect,
+                    UseCookies = httpClientConfig.UseCookies,
+                    CookieContainer = cookieContainer,
+                };
+
+                if (httpClientConfig.AllowByPassCertificateCheck)
+                    handler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+
+                if (httpClientConfig is { ProxyAddress: not null, ProxyPassword: not null, ProxyUser: not null })
+                {
+                    var proxy = new WebProxy(httpClientConfig.ProxyAddress);
+                    proxy.Credentials = new NetworkCredential(httpClientConfig.ProxyUser, httpClientConfig.ProxyPassword);
+                    handler.Proxy = proxy;
+                }
+
+                return handler;
+            });
         }
 
         return services;

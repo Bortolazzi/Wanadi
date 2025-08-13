@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography;
 using Microsoft.ProgramSynthesis.Detection.Encoding;
+using UtfUnknown;
 
 namespace Wanadi.Common.Helpers;
 
@@ -62,74 +63,8 @@ public static class FileHelper
     ///         en-US: File Read in Text.
     ///     </para>
     /// </returns>
-    public static string Read(string filePath)
-        => FileHelper.Read(filePath, FileHelper.DetectEncoding(filePath));
-
-    /// <summary>
-    ///     <para>
-    ///         pt-BR: Realiza a leitura de um arquivo em texto utilizando o Encoding informado.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Reads a text file using the specified Encoding.
-    ///     </para>
-    /// </summary>
-    /// <param name="filePath">
-    ///     <para>
-    ///         pt-BR: Caminho do arquivo.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Path of the file.
-    ///     </para>
-    /// </param>
-    /// <param name="encodingFile">
-    ///     <para>
-    ///         pt-BR: Encoding para leitura.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Encoding for reading.
-    ///     </para>
-    /// </param>
-    /// <returns>
-    ///     <para>
-    ///         pt-BR: Arquivo lido em texto.
-    ///     </para>
-    ///     <para>
-    ///         en-US: File Read in Text.
-    ///     </para>
-    /// </returns>
-    public static string Read(string filePath, Encoding encodingFile)
-    {
-        using (var fileStream = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
-        using (var streamReader = new StreamReader(fileStream, encodingFile))
-            return streamReader.ReadToEnd();
-    }
-
-    /// <summary>
-    ///     <para>
-    ///         pt-BR: Realiza a leitura de um arquivo em texto identificando o Encoding automaticamente.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Reads a text file by automatically identifying the Encoding.
-    ///     </para>
-    /// </summary>
-    /// <param name="filePath">
-    ///     <para>
-    ///         pt-BR: Caminho do arquivo.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Path of the file.
-    ///     </para>
-    /// </param>
-    /// <returns>
-    ///     <para>
-    ///         pt-BR: Arquivo lido em texto.
-    ///     </para>
-    ///     <para>
-    ///         en-US: File Read in Text.
-    ///     </para>
-    /// </returns>
     public static async Task<string> ReadAsync(string filePath)
-       => await FileHelper.ReadAsync(filePath, FileHelper.DetectEncoding(filePath));
+       => await FileHelper.ReadAsync(filePath, await FileHelper.DetectEncodingAsync(filePath));
 
     /// <summary>
     ///     <para>
@@ -198,82 +133,8 @@ public static class FileHelper
     ///         en-US: File Read in lines.
     ///     </para>
     /// </returns>
-    public static List<string> ReadLines(string filePath)
-        => FileHelper.ReadLines(filePath, FileHelper.DetectEncoding(filePath));
-
-    /// <summary>
-    ///     <para>
-    ///         pt-BR: Realiza a leitura de um arquivo em linhas utilizando o Encoding informado.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Reads a file in lines using the specified Encoding.
-    ///     </para>
-    /// </summary>
-    /// <param name="filePath">
-    ///     <para>
-    ///         pt-BR: Caminho do arquivo.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Path of the file.
-    ///     </para>
-    /// </param>
-    /// <param name="encodingFile">
-    ///     <para>
-    ///         pt-BR: Encoding para leitura.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Encoding for reading.
-    ///     </para>
-    /// </param>
-    /// <returns>
-    ///     <para>
-    ///         pt-BR: Arquivo lido em linhas.
-    ///     </para>
-    ///     <para>
-    ///         en-US: File Read in lines.
-    ///     </para>
-    /// </returns>
-    public static List<string> ReadLines(string filePath, Encoding encodingFile)
-    {
-        var response = new List<string>();
-
-        using (var fileStream = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
-        using (var streamReader = new StreamReader(fileStream, encodingFile))
-        {
-            string? _line = null;
-            while ((_line = streamReader.ReadLine()) != null)
-                response.Add(_line);
-        }
-
-        return response;
-    }
-
-    /// <summary>
-    ///     <para>
-    ///         pt-BR: Realiza a leitura de um arquivo em linhas identificando o Encoding automaticamente.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Reads a file in lines, automatically identifying the Encoding.
-    ///     </para>
-    /// </summary>
-    /// <param name="filePath">
-    ///     <para>
-    ///         pt-BR: Caminho do arquivo.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Path of the file.
-    ///     </para>
-    /// </param>
-    /// <returns>
-    ///     <para>
-    ///         pt-BR: Arquivo lido em linhas.
-    ///     </para>
-    ///     <para>
-    ///         en-US: File Read in lines.
-    ///     </para>
-    /// </returns>
     public static async Task<List<string>> ReadLinesAsync(string filePath)
-        => await FileHelper.ReadLinesAsync(filePath, FileHelper.DetectEncoding(filePath));
+        => await FileHelper.ReadLinesAsync(filePath, await FileHelper.DetectEncodingAsync(filePath));
 
     /// <summary>
     ///     <para>
@@ -350,75 +211,6 @@ public static class FileHelper
     ///         en-US: Content to be written.
     ///     </para>
     /// </param>
-    public static void Create(string filePath, string content)
-        => FileHelper.Create(filePath, content, Encoding.UTF8);
-
-    /// <summary>
-    ///     <para>
-    ///         pt-BR: Cria um arquivo escrevendo o conteúdo informado. Utilizando o Encoding informado.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Creates a file writing the informed content. Using the informed Encoding
-    ///     </para>
-    /// </summary>
-    /// <param name="filePath">
-    ///     <para>
-    ///         pt-BR: Caminho do arquivo.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Path of the file.
-    ///     </para>
-    /// </param>
-    /// <param name="content">
-    ///     <para>
-    ///         pt-BR: Conteúdo a ser escrito.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Content to be written.
-    ///     </para>
-    /// </param>
-    /// <param name="encoding">
-    ///     <para>
-    ///         pt-BR: Encoding a ser utilizado na escrita do arquivo.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Encoding to be used when writing the file.
-    ///     </para>
-    /// </param>
-    public static void Create(string filePath, string content, Encoding encoding)
-    {
-        using (var _streamWriter = new StreamWriter(filePath, false, encoding))
-        {
-            _streamWriter.AutoFlush = true;
-            _streamWriter.Write(content);
-            _streamWriter.Flush();
-        }
-    }
-
-    /// <summary>
-    ///     <para>
-    ///         pt-BR: Cria um arquivo escrevendo o conteúdo informado. Utilizando o Encoding UTF8
-    ///     </para>
-    ///     <para>
-    ///         en-US: Creates a file writing the informed content. Using UTF8 Encoding
-    ///     </para>
-    /// </summary>
-    /// <param name="filePath">
-    ///     <para>
-    ///         pt-BR: Caminho do arquivo.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Path of the file.
-    ///     </para>
-    /// </param>
-    /// <param name="content">
-    ///     <para>
-    ///         pt-BR: Conteúdo a ser escrito.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Content to be written.
-    ///     </para>
-    /// </param>
     public static async Task CreateAsync(string filePath, string content)
         => await FileHelper.CreateAsync(filePath, content, Encoding.UTF8);
 
@@ -461,75 +253,6 @@ public static class FileHelper
             _streamWriter.AutoFlush = true;
             await _streamWriter.WriteAsync(content);
             await _streamWriter.FlushAsync();
-        }
-    }
-
-    /// <summary>
-    ///     <para>
-    ///         pt-BR: Cria um arquivo escrevendo o conteúdo informado. Utilizando o Encoding UTF8
-    ///     </para>
-    ///     <para>
-    ///         en-US: Creates a file writing the informed content. Using UTF8 Encoding
-    ///     </para>
-    /// </summary>
-    /// <param name="filePath">
-    ///     <para>
-    ///         pt-BR: Caminho do arquivo.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Path of the file.
-    ///     </para>
-    /// </param>
-    /// <param name="lines">
-    ///     <para>
-    ///         pt-BR: Conteúdo a ser escrito.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Content to be written.
-    ///     </para>
-    /// </param>
-    public static void Create(string filePath, List<string> lines)
-        => FileHelper.Create(filePath, lines, Encoding.UTF8);
-
-    /// <summary>
-    ///     <para>
-    ///         pt-BR: Cria um arquivo escrevendo o conteúdo informado. Utilizando o Encoding informado.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Creates a file writing the informed content. Using the informed Encoding
-    ///     </para>
-    /// </summary>
-    /// <param name="filePath">
-    ///     <para>
-    ///         pt-BR: Caminho do arquivo.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Path of the file.
-    ///     </para>
-    /// </param>
-    /// <param name="lines">
-    ///     <para>
-    ///         pt-BR: Conteúdo a ser escrito.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Content to be written.
-    ///     </para>
-    /// </param>
-    /// <param name="encoding">
-    ///     <para>
-    ///         pt-BR: Encoding a ser utilizado na escrita do arquivo.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Encoding to be used when writing the file.
-    ///     </para>
-    /// </param>
-    public static void Create(string filePath, List<string> lines, Encoding encoding)
-    {
-        using (var _streamWriter = new StreamWriter(filePath, false, encoding))
-        {
-            _streamWriter.AutoFlush = true;
-            lines.ForEach(_streamWriter.WriteLine);
-            _streamWriter.Flush();
         }
     }
 
@@ -633,75 +356,6 @@ public static class FileHelper
     ///         en-US: Content to be written.
     ///     </para>
     /// </param>
-    public static void AppendText(string filePath, string content)
-       => FileHelper.AppendText(filePath, content, Encoding.UTF8);
-
-    /// <summary>
-    ///     <para>
-    ///         pt-BR: Acrescenta conteúdo a um arquivo utilizando o encoding informado.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Append content to a file using the specified encoding
-    ///     </para>
-    /// </summary>
-    /// <param name="filePath">
-    ///     <para>
-    ///         pt-BR: Caminho do arquivo.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Path of the file.
-    ///     </para>
-    /// </param>
-    /// <param name="content">
-    ///     <para>
-    ///         pt-BR: Conteúdo a ser escrito.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Content to be written.
-    ///     </para>
-    /// </param>
-    /// <param name="encoding">
-    ///     <para>
-    ///         pt-BR: Encoding a ser utilizado na escrita do arquivo.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Encoding to be used when writing the file.
-    ///     </para>
-    /// </param>
-    public static void AppendText(string filePath, string content, Encoding encoding)
-    {
-        using (var _streamWriter = new StreamWriter(filePath, true, encoding))
-        {
-            _streamWriter.AutoFlush = true;
-            _streamWriter.WriteLine(content);
-            _streamWriter.Flush();
-        }
-    }
-
-    /// <summary>
-    ///     <para>
-    ///         pt-BR: Acrescenta conteúdo a um arquivo utilizando UTF8 como encoding.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Append content to a file using UTF8 as encoding.
-    ///     </para>
-    /// </summary>
-    /// <param name="filePath">
-    ///     <para>
-    ///         pt-BR: Caminho do arquivo.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Path of the file.
-    ///     </para>
-    /// </param>
-    /// <param name="content">
-    ///     <para>
-    ///         pt-BR: Conteúdo a ser escrito.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Content to be written.
-    ///     </para>
-    /// </param>
     public static async Task AppendTextAsync(string filePath, string content)
         => await FileHelper.AppendTextAsync(filePath, content, Encoding.UTF8);
 
@@ -744,75 +398,6 @@ public static class FileHelper
             _streamWriter.AutoFlush = true;
             await _streamWriter.WriteLineAsync(content);
             await _streamWriter.FlushAsync();
-        }
-    }
-
-    /// <summary>
-    ///     <para>
-    ///         pt-BR: Acrescenta conteúdo a um arquivo utilizando UTF8 como encoding.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Append content to a file using UTF8 as encoding.
-    ///     </para>
-    /// </summary>
-    /// <param name="filePath">
-    ///     <para>
-    ///         pt-BR: Caminho do arquivo.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Path of the file.
-    ///     </para>
-    /// </param>
-    /// <param name="lines">
-    ///     <para>
-    ///         pt-BR: Conteúdo a ser escrito.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Content to be written.
-    ///     </para>
-    /// </param>
-    public static void AppendText(string filePath, List<string> lines)
-        => FileHelper.AppendText(filePath, lines, Encoding.UTF8);
-
-    /// <summary>
-    ///     <para>
-    ///         pt-BR: Acrescenta conteúdo a um arquivo utilizando o encoding informado.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Append content to a file using the specified encoding
-    ///     </para>
-    /// </summary>
-    /// <param name="filePath">
-    ///     <para>
-    ///         pt-BR: Caminho do arquivo.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Path of the file.
-    ///     </para>
-    /// </param>
-    /// <param name="lines">
-    ///     <para>
-    ///         pt-BR: Conteúdo a ser escrito.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Content to be written.
-    ///     </para>
-    /// </param>
-    /// <param name="encoding">
-    ///     <para>
-    ///         pt-BR: Encoding a ser utilizado na escrita do arquivo.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Encoding to be used when writing the file.
-    ///     </para>
-    /// </param>
-    public static void AppendText(string filePath, List<string> lines, Encoding encoding)
-    {
-        using (StreamWriter _streamWriter = new StreamWriter(filePath, true, encoding))
-        {
-            _streamWriter.AutoFlush = true;
-            lines.ForEach(_streamWriter.WriteLine);
-            _streamWriter.Flush();
         }
     }
 
@@ -916,76 +501,8 @@ public static class FileHelper
     ///         en-US: Returns the first line found in the file.
     ///     </para>
     /// </returns>
-    public static string? ReadFirstLine(string filePath)
-        => ReadFirstLine(filePath, FileHelper.DetectEncoding(filePath));
-
-    /// <summary>
-    ///     <para>
-    ///         pt-BR: Realiza a leitura da primeira linha de um arquivo com o Enconding informado.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Reads the first line of a file with the specified Enconding.
-    ///     </para>
-    /// </summary>
-    /// <param name="filePath">
-    ///     <para>
-    ///         pt-BR: Caminho do arquivo.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Path of the file.
-    ///     </para>
-    /// </param>
-    /// <param name="encoding">
-    ///     <para>
-    ///         pt-BR: Encoding a ser utilizado na escrita do arquivo.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Encoding to be used when writing the file.
-    ///     </para>
-    /// </param>
-    /// <returns>
-    ///     <para>
-    ///         pt-BR: Retorna a primeira linha encontrada no arquivo.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Returns the first line found in the file.
-    ///     </para>
-    /// </returns>
-    public static string? ReadFirstLine(string filePath, Encoding encoding)
-    {
-        using (FileStream fileStream = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
-        using (StreamReader streamReader = new StreamReader(fileStream, encoding))
-        {
-            return streamReader.ReadLine();
-        }
-    }
-
-    /// <summary>
-    ///     <para>
-    ///         pt-BR: Realiza a leitura da primeira linha de um arquivo identificando o Encoding automaticamente.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Reads the first line of a file, automatically identifying the Encoding.
-    ///     </para>
-    /// </summary>
-    /// <param name="filePath">
-    ///     <para>
-    ///         pt-BR: Caminho do arquivo.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Path of the file.
-    ///     </para>
-    /// </param>
-    /// <returns>
-    ///     <para>
-    ///         pt-BR: Retorna a primeira linha encontrada no arquivo.
-    ///     </para>
-    ///     <para>
-    ///         en-US: Returns the first line found in the file.
-    ///     </para>
-    /// </returns>
     public static async Task<string?> ReadFirstLineAsync(string filePath)
-        => await ReadFirstLineAsync(filePath, FileHelper.DetectEncoding(filePath));
+        => await ReadFirstLineAsync(filePath, await FileHelper.DetectEncodingAsync(filePath));
 
     /// <summary>
     ///     <para>
@@ -1054,10 +571,17 @@ public static class FileHelper
     ///         en-US: Encoding identified.
     ///     </para>
     /// </returns>
-    public static Encoding DetectEncoding(string filePath)
+    public static async Task<Encoding> DetectEncodingAsync(string filePath)
     {
         try
         {
+            var utfResult = await CharsetDetector.DetectFromFileAsync(filePath);
+            if (utfResult is { Detected: not null })
+            {
+                if (utfResult.Detected is { Encoding: not null })
+                    return utfResult.Detected.Encoding;
+            }
+
             using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
             {
                 if (stream.CanSeek)

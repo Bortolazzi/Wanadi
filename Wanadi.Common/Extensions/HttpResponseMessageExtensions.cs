@@ -122,7 +122,9 @@ public static class HttpResponseMessageExtensions
         var contentDisposition = response.Content.Headers.ContentDisposition;
         if (contentDisposition != null && !string.IsNullOrEmpty(contentDisposition.FileName))
         {
-            return Path.GetExtension(contentDisposition.FileName);
+            var extension = Path.GetExtension(contentDisposition.FileName);
+            if (extension is { Length: > 0 })
+                return extension.Replace("\"", string.Empty);
         }
 
         var mediaType = response.Content.Headers.ContentType?.MediaType;
