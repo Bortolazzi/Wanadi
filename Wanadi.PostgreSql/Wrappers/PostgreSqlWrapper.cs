@@ -413,7 +413,7 @@ public static class PostgreSqlWrapper
         if (properties.Count == 0)
             throw new Exception($"Unable to map object properties with database columns.");
 
-        var columns = string.Join(',', properties.Select(t => t.ColumnName).ToList());
+        var columns = string.Join(',', properties.Select(t => $"\"{t.ColumnName}\"").ToList());
         var commandPrefix = $"COPY {tableName} ({columns}) FROM STDIN (FORMAT BINARY)";
 
         if (connection.State != ConnectionState.Open)

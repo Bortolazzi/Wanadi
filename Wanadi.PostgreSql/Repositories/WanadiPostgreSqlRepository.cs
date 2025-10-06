@@ -55,12 +55,12 @@ public abstract class WanadiPostgreSqlRepository<TEntity> : IWanadiPostgreSqlRep
             if (value == null)
                 value = DBNull.Value;
 
-            var parameterToAdd = new NpgsqlParameter($"@{property.ColumnName}", property.PostgreSqlType);
+            var parameterToAdd = new NpgsqlParameter($"@param_{property.ColumnName}", property.PostgreSqlType);
             parameterToAdd.Value = value;
             parameters.Add(parameterToAdd);
         }
 
-        var commandToExecute = $"INSERT INTO {tableName} ({string.Join(", ", properties.Select(t => t.ColumnName).ToList())}) VALUES ({string.Join(", ", properties.Select(t => $"@{t.ColumnName}").ToList())}) returning {identifier.ColumnName};";
+        var commandToExecute = $"INSERT INTO {tableName} ({string.Join(", ", properties.Select(t => $"\"{t.ColumnName}\"").ToList())}) VALUES ({string.Join(", ", properties.Select(t => $"@param_{t.ColumnName}").ToList())}) returning \"{identifier.ColumnName}\";";
 
         var idValue = await PostgreSqlWrapper.ExecuteScalarAsync(await GetConnectionAsync(), commandToExecute, parameters);
 
@@ -101,7 +101,7 @@ public abstract class WanadiPostgreSqlRepository<TEntity> : IWanadiPostgreSqlRep
 
         var parameters = new List<NpgsqlParameter>();
 
-        var identifierParameter = new NpgsqlParameter($"@{identifier.ColumnName}", identifier.PostgreSqlType);
+        var identifierParameter = new NpgsqlParameter($"@param_{identifier.ColumnName}", identifier.PostgreSqlType);
         identifierParameter.Value = identifier.PropertyInfo.GetValue(entity);
 
         parameters.Add(identifierParameter);
@@ -115,12 +115,12 @@ public abstract class WanadiPostgreSqlRepository<TEntity> : IWanadiPostgreSqlRep
             if (value == null)
                 value = DBNull.Value;
 
-            var parameterToAdd = new NpgsqlParameter($"@{property.ColumnName}", property.PostgreSqlType);
+            var parameterToAdd = new NpgsqlParameter($"@param_{property.ColumnName}", property.PostgreSqlType);
             parameterToAdd.Value = value;
             parameters.Add(parameterToAdd);
         }
 
-        var commandToExecute = $"UPDATE {tableName} SET {string.Join(", ", properties.Select(t => $"{t.ColumnName} = @{t.ColumnName}").ToList())} WHERE {identifier.ColumnName} = @{identifier.ColumnName};";
+        var commandToExecute = $"UPDATE {tableName} SET {string.Join(", ", properties.Select(t => $"\"{t.ColumnName}\" = @param_{t.ColumnName}").ToList())} WHERE \"{identifier.ColumnName}\" = @param_{identifier.ColumnName};";
         await PostgreSqlWrapper.ExecuteNonQueryAsync(await GetConnectionAsync(), commandToExecute, parameters);
     }
 
