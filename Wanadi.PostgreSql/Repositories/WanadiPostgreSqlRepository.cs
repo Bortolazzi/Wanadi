@@ -133,7 +133,7 @@ public abstract class WanadiPostgreSqlRepository<TEntity> : IWanadiPostgreSqlRep
 
         var identifier = properties.FirstOrDefault(t => t.HasKeyAttribute);
 
-        properties = properties.Where(t => !t.IgnoreOnInsert).ToList();
+        properties = properties.Where(t => !t.IgnoreOnInsert && !t.HasKeyAttribute).ToList();
         if (properties.Any() is false)
             throw new Exception($"Unable to identify entity properties.");
 
