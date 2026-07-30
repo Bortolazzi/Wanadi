@@ -63,10 +63,10 @@ public static partial class PostgreSqlWrapper
     public static NpgsqlConnection GetConnection(string connectionString)
         => GetConnectionAsync(connectionString).GetAwaiter().GetResult();
 
-    public static async Task<NpgsqlConnection> GetConnectionAsync(string connectionString)
+    public static async Task<NpgsqlConnection> GetConnectionAsync(string connectionString, CancellationToken cancellationToken = default)
     {
         var connection = new NpgsqlConnection(connectionString);
-        await connection.OpenAsync();
+        await connection.OpenAsync(cancellationToken);
         return connection;
     }
 
@@ -74,17 +74,17 @@ public static partial class PostgreSqlWrapper
 
     #region [DescribeTableAsync]
 
-    public static async Task<List<NpgsqlDbColumn>> DescribeTableAsync(NpgsqlConnection connection, string tableName)
+    public static async Task<List<NpgsqlDbColumn>> DescribeTableAsync(NpgsqlConnection connection, string tableName, CancellationToken cancellationToken = default)
     {
         if (connection.State != ConnectionState.Open)
-            await connection.OpenAsync();
+            await connection.OpenAsync(cancellationToken);
 
         using (var command = new NpgsqlCommand($"SELECT * FROM {tableName} WHERE (1=0);", connection))
         {
             command.CommandType = CommandType.Text;
-            using (var reader = await command.ExecuteReaderAsync())
+            using (var reader = await command.ExecuteReaderAsync(cancellationToken))
             {
-                var columns = await reader.GetColumnSchemaAsync();
+                var columns = await reader.GetColumnSchemaAsync(cancellationToken);
 
                 return columns.ToList();
             }
@@ -93,10 +93,10 @@ public static partial class PostgreSqlWrapper
 
     #endregion [DescribeTableAsync]
 
-    public static async Task<List<PostgreSqlPropertyDataType>> MapPropertiesAsync<TType>(NpgsqlConnection connection, string tableName) where TType : class
+    public static async Task<List<PostgreSqlPropertyDataType>> MapPropertiesAsync<TType>(NpgsqlConnection connection, string tableName, CancellationToken cancellationToken = default) where TType : class
     {
         var properties = typeof(TType).GetProperties().Select(t => new PostgreSqlPropertyDataType(t)).ToList();
-        var dbColumns = await DescribeTableAsync(connection, tableName);
+        var dbColumns = await DescribeTableAsync(connection, tableName, cancellationToken);
 
         properties = (from a in properties
                       join b in dbColumns on a.ColumnName equals b.ColumnName
@@ -105,10 +105,10 @@ public static partial class PostgreSqlWrapper
         return properties;
     }
 
-    public static async Task<List<PostgreSqlPropertyDataType>> GetResultFieldsAsync<TType>(NpgsqlDataReader dataReader) where TType : class
+    public static async Task<List<PostgreSqlPropertyDataType>> GetResultFieldsAsync<TType>(NpgsqlDataReader dataReader, CancellationToken cancellationToken = default) where TType : class
     {
         var properties = typeof(TType).GetProperties().Select(t => new PostgreSqlPropertyDataType(t)).ToList();
-        var columns = await dataReader.GetColumnSchemaAsync();
+        var columns = await dataReader.GetColumnSchemaAsync(cancellationToken);
 
         var response = (from a in properties
                         join b in columns on a.ColumnName equals b.ColumnName

@@ -18,7 +18,7 @@ var lista1000000 = GenerateData(1000000);
 
 var repository = new TableRepository(connectionString);
 
-var readingTest = await repository.SelectQueryAsync<TableEntity>("select * from  table_test");
+var readingTest = await repository.QueryAsync<TableEntity>("select * from  table_test");
 
 var sw = new Stopwatch();
 
