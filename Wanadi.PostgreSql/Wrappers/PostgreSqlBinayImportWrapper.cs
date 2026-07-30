@@ -89,7 +89,7 @@ public static partial class PostgreSqlWrapper
 
                 foreach (var property in properties)
                 {
-                    var value = property.PropertyInfo.GetValue(item);
+                    var value = property.GetValue(item);
                     if (value == null)
                     {
                         await binaryImporter.WriteNullAsync(cancellationToken);

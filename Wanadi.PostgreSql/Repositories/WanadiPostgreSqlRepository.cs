@@ -53,7 +53,7 @@ public abstract class WanadiPostgreSqlRepository<TEntity> : IWanadiPostgreSqlRep
 
         foreach (var property in properties)
         {
-            var value = property.PropertyInfo.GetValue(entity);
+            var value = property.GetValue(entity);
             if (value == null && !property.AllowNull)
                 throw new Exception($"Property {property.Name} does not allow null values.");
 
@@ -72,7 +72,7 @@ public abstract class WanadiPostgreSqlRepository<TEntity> : IWanadiPostgreSqlRep
 
         var idValue = await PostgreSqlWrapper.ExecuteScalarAsync(connection, commandToExecute, parameters, cancellationToken);
 
-        identifier.PropertyInfo.SetValue(entity, idValue);
+        identifier.SetValue(entity, idValue);
 
         return entity;
     }
@@ -139,7 +139,7 @@ public abstract class WanadiPostgreSqlRepository<TEntity> : IWanadiPostgreSqlRep
 
         var parameters = new List<NpgsqlParameter>();
 
-        var identifierValue = identifier.PropertyInfo.GetValue(entity);
+        var identifierValue = identifier.GetValue(entity);
         var identifierParameter = new NpgsqlParameter($"@param_{identifier.ColumnName}", identifierValue);
         if (identifier.PostgreSqlType.HasValue)
             identifierParameter.NpgsqlDbType = identifier.PostgreSqlType.Value;
@@ -150,7 +150,7 @@ public abstract class WanadiPostgreSqlRepository<TEntity> : IWanadiPostgreSqlRep
 
         foreach (var property in properties)
         {
-            var value = property.PropertyInfo.GetValue(entity);
+            var value = property.GetValue(entity);
             if (value == null && !property.AllowNull)
                 throw new Exception($"Property {property.Name} does not allow null values.");
 

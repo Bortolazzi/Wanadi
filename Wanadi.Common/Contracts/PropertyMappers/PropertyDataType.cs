@@ -10,6 +10,7 @@ public record PropertyDataType
     public PropertyDataType(PropertyInfo property)
     {
         PropertyInfo = property;
+        CompiledGetter = CreateGetter(property);
         CompiledSetter = CreateSetter(property);
         Name = property.Name;
 
@@ -44,6 +45,7 @@ public record PropertyDataType
     }
 
     public PropertyInfo PropertyInfo { get; set; }
+    public Func<object, object?>? CompiledGetter { get; set; }
     public Action<object, object?>? CompiledSetter { get; set; }
     public string Name { get; set; }
     public string ColumnName
@@ -67,6 +69,34 @@ public record PropertyDataType
         }
 
         PropertyInfo.SetValue(instance, value, null);
+    }
+
+    public object? GetValue(object instance)
+    {
+        if (CompiledGetter is not null)
+            return CompiledGetter(instance);
+
+        return PropertyInfo.GetValue(instance);
+    }
+
+    private static Func<object, object?>? CreateGetter(PropertyInfo property)
+    {
+        if (property.GetMethod is null)
+            return null;
+
+        try
+        {
+            var instance = Expression.Parameter(typeof(object), "instance");
+            var convertedInstance = Expression.Convert(instance, property.DeclaringType!);
+            var propertyAccess = Expression.Property(convertedInstance, property);
+            var convertedValue = Expression.Convert(propertyAccess, typeof(object));
+
+            return Expression.Lambda<Func<object, object?>>(convertedValue, instance).Compile();
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     private static Action<object, object?>? CreateSetter(PropertyInfo property)

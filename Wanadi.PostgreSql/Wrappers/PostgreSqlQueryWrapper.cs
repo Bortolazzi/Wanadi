@@ -39,7 +39,6 @@ public static partial class PostgreSqlWrapper
             if (parameters is not null && parameters.Count > 0)
             {
                 parameters.ForEach(t => command.Parameters.Add(t));
-                await command.PrepareAsync(cancellationToken);
             }
 
             using (var reader = await command.ExecuteReaderAsync(cancellationToken))
@@ -50,7 +49,7 @@ public static partial class PostgreSqlWrapper
                 var resultFields = await GetResultFieldsAsync<TType>(reader, cancellationToken);
 
                 if (resultFields.Any() is false)
-                    return null;
+                    throw new Exception($"Unable to map query result columns with type {typeof(TType).FullName}.");
 
                 var response = new List<TType>();
 
