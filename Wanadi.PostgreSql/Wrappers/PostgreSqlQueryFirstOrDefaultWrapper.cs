@@ -5,24 +5,24 @@ namespace Wanadi.PostgreSql.Wrappers;
 
 public static partial class PostgreSqlWrapper
 {
-    public static TType? SelectQueryFirstOrDefault<TType>(string connectionString, string commandQuery, List<NpgsqlParameter>? parameters = null) where TType : class
-        => SelectQueryFirstOrDefaultAsync<TType>(connectionString, commandQuery, parameters).GetAwaiter().GetResult();
+    public static TType? QueryFirstOrDefault<TType>(string connectionString, string commandQuery, List<NpgsqlParameter>? parameters = null) where TType : class
+        => QueryFirstOrDefaultAsync<TType>(connectionString, commandQuery, parameters).GetAwaiter().GetResult();
 
-    public static TType? SelectQueryFirstOrDefault<TType>(NpgsqlConnection connection, string commandQuery, List<NpgsqlParameter>? parameters = null) where TType : class
-        => SelectQueryFirstOrDefaultAsync<TType>(connection, commandQuery, parameters).GetAwaiter().GetResult();
+    public static TType? QueryFirstOrDefault<TType>(NpgsqlConnection connection, string commandQuery, List<NpgsqlParameter>? parameters = null) where TType : class
+        => QueryFirstOrDefaultAsync<TType>(connection, commandQuery, parameters).GetAwaiter().GetResult();
 
-    public static async Task<TType?> SelectQueryFirstOrDefaultAsync<TType>(string connectionString, string commandQuery, List<NpgsqlParameter>? parameters = null) where TType : class
+    public static async Task<TType?> QueryFirstOrDefaultAsync<TType>(string connectionString, string commandQuery, List<NpgsqlParameter>? parameters = null, CancellationToken cancellationToken = default) where TType : class
     {
-        using (var connection = await GetConnectionAsync(connectionString))
+        using (var connection = await GetConnectionAsync(connectionString, cancellationToken))
         {
-            return await SelectQueryFirstOrDefaultAsync<TType>(connection, commandQuery, parameters);
+            return await QueryFirstOrDefaultAsync<TType>(connection, commandQuery, parameters, cancellationToken);
         }
     }
 
-    public static async Task<TType?> SelectQueryFirstOrDefaultAsync<TType>(NpgsqlConnection connection, string commandQuery, List<NpgsqlParameter>? parameters = null) where TType : class
+    public static async Task<TType?> QueryFirstOrDefaultAsync<TType>(NpgsqlConnection connection, string commandQuery, List<NpgsqlParameter>? parameters = null, CancellationToken cancellationToken = default) where TType : class
     {
         if (connection.State != ConnectionState.Open)
-            await connection.OpenAsync();
+            await connection.OpenAsync(cancellationToken);
 
         using (var command = new NpgsqlCommand(commandQuery, connection))
         {
@@ -31,21 +31,20 @@ public static partial class PostgreSqlWrapper
             if (parameters is not null && parameters.Count > 0)
             {
                 parameters.ForEach(t => command.Parameters.Add(t));
-                await command.PrepareAsync();
             }
 
-            using (var reader = await command.ExecuteReaderAsync())
+            using (var reader = await command.ExecuteReaderAsync(cancellationToken))
             {
                 if (!reader.HasRows)
                     return null;
 
-                var resultFields = await GetResultFieldsAsync<TType>(reader);
+                var resultFields = await GetResultFieldsAsync<TType>(reader, cancellationToken);
                 if (resultFields.Count == 0)
                     return null;
 
                 var response = new List<TType>();
 
-                while (await reader.ReadAsync())
+                while (await reader.ReadAsync(cancellationToken))
                 {
                     return ConvertDataReaderToClass<TType>(reader, resultFields);
                 }
