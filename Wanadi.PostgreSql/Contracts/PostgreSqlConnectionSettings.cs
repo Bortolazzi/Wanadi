@@ -1,6 +1,6 @@
 ﻿namespace Wanadi.PostgreSql.Contracts;
 
-public class PostgreSqlConnectionSettings
+public record PostgreSqlConnectionSettings
 {
     public string Host { get; set; }
     public string Username { get; set; }
