@@ -78,10 +78,38 @@ public abstract class WanadiPostgreSqlRepository<TEntity> : IWanadiPostgreSqlRep
     }
 
     public async Task<TEntity?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
-        => await FirstOrDefaultAsync($"SELECT * FROM {GetTableName()} WHERE id = {id};", cancellationToken: cancellationToken);
+        => await GetByIdAsync<int>(id, cancellationToken);
+
+    public async Task<TEntity?> GetByIdAsync<TId>(TId id, CancellationToken cancellationToken = default)
+    {
+        var tableName = GetTableName();
+
+        await using var connection = await GetConnectionAsync(cancellationToken);
+
+        var properties = await GetMappedPropertiesAsync(connection, tableName, cancellationToken);
+        var identifier = GetIdentifier(properties);
+        var parameter = CreateParameter(identifier, id);
+        var query = $"SELECT * FROM {tableName} WHERE \"{identifier.ColumnName}\" = @param_{identifier.ColumnName};";
+
+        return await PostgreSqlWrapper.QueryFirstOrDefaultAsync<TEntity>(connection, query, new List<NpgsqlParameter> { parameter }, cancellationToken);
+    }
 
     public async Task DeleteByIdAsync(int id, CancellationToken cancellationToken = default)
-        => await ExecuteNonQueryAsync($"DELETE FROM {GetTableName()} WHERE id = {id};", cancellationToken: cancellationToken);
+        => await DeleteByIdAsync<int>(id, cancellationToken);
+
+    public async Task DeleteByIdAsync<TId>(TId id, CancellationToken cancellationToken = default)
+    {
+        var tableName = GetTableName();
+
+        await using var connection = await GetConnectionAsync(cancellationToken);
+
+        var properties = await GetMappedPropertiesAsync(connection, tableName, cancellationToken);
+        var identifier = GetIdentifier(properties);
+        var parameter = CreateParameter(identifier, id);
+        var query = $"DELETE FROM {tableName} WHERE \"{identifier.ColumnName}\" = @param_{identifier.ColumnName};";
+
+        await PostgreSqlWrapper.ExecuteNonQueryAsync(connection, query, new List<NpgsqlParameter> { parameter }, cancellationToken);
+    }
 
     public async Task UpdateAsync(TEntity entity, string? tableName = null, CancellationToken cancellationToken = default)
     {
@@ -231,6 +259,28 @@ public abstract class WanadiPostgreSqlRepository<TEntity> : IWanadiPostgreSqlRep
         properties = await PostgreSqlWrapper.MapPropertiesAsync<TEntity>(connection, tableName, cancellationToken);
 
         return _propertyMapCache.GetOrAdd(tableName, properties);
+    }
+
+    private static PostgreSqlPropertyDataType GetIdentifier(List<PostgreSqlPropertyDataType> properties)
+    {
+        if (properties.Any(t => t.HasKeyAttribute) is false)
+            throw new Exception($"Entity does not have an identifier defined in the properties. (KeyAttribute)");
+
+        if (properties.Count(t => t.HasKeyAttribute) > 1)
+            throw new Exception($"Entity has more than one identifying property. Method only allows one. (KeyAttribute)");
+
+        return properties.First(t => t.HasKeyAttribute);
+    }
+
+    private static NpgsqlParameter CreateParameter<TValue>(PostgreSqlPropertyDataType property, TValue value)
+    {
+        var parameter = new NpgsqlParameter($"@param_{property.ColumnName}", value ?? (object)DBNull.Value);
+        if (property.PostgreSqlType.HasValue)
+            parameter.NpgsqlDbType = property.PostgreSqlType.Value;
+
+        parameter.Value = value ?? (object)DBNull.Value;
+
+        return parameter;
     }
 
     public void Dispose()

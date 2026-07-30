@@ -10,7 +10,9 @@ public interface IWanadiPostgreSqlRepository<TEntity> : IDisposable where TEntit
     Task UpdateAsync(TEntity entity, string? tableName = null, CancellationToken cancellationToken = default);
 
     Task<TEntity?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
+    Task<TEntity?> GetByIdAsync<TId>(TId id, CancellationToken cancellationToken = default);
     Task DeleteByIdAsync(int id, CancellationToken cancellationToken = default);
+    Task DeleteByIdAsync<TId>(TId id, CancellationToken cancellationToken = default);
 
     Task<List<TEntity>> ToListAsync(CancellationToken cancellationToken = default);
 
