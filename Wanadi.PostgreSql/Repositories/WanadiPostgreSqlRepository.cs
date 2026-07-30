@@ -60,7 +60,10 @@ public abstract class WanadiPostgreSqlRepository<TEntity> : IWanadiPostgreSqlRep
             if (value == null)
                 value = DBNull.Value;
 
-            var parameterToAdd = new NpgsqlParameter($"@param_{property.ColumnName}", property.PostgreSqlType);
+            var parameterToAdd = new NpgsqlParameter($"@param_{property.ColumnName}", value);
+            if (property.PostgreSqlType.HasValue)
+                parameterToAdd.NpgsqlDbType = property.PostgreSqlType.Value;
+
             parameterToAdd.Value = value;
             parameters.Add(parameterToAdd);
         }
@@ -108,8 +111,12 @@ public abstract class WanadiPostgreSqlRepository<TEntity> : IWanadiPostgreSqlRep
 
         var parameters = new List<NpgsqlParameter>();
 
-        var identifierParameter = new NpgsqlParameter($"@param_{identifier.ColumnName}", identifier.PostgreSqlType);
-        identifierParameter.Value = identifier.PropertyInfo.GetValue(entity);
+        var identifierValue = identifier.PropertyInfo.GetValue(entity);
+        var identifierParameter = new NpgsqlParameter($"@param_{identifier.ColumnName}", identifierValue);
+        if (identifier.PostgreSqlType.HasValue)
+            identifierParameter.NpgsqlDbType = identifier.PostgreSqlType.Value;
+
+        identifierParameter.Value = identifierValue;
 
         parameters.Add(identifierParameter);
 
@@ -122,7 +129,10 @@ public abstract class WanadiPostgreSqlRepository<TEntity> : IWanadiPostgreSqlRep
             if (value == null)
                 value = DBNull.Value;
 
-            var parameterToAdd = new NpgsqlParameter($"@param_{property.ColumnName}", property.PostgreSqlType);
+            var parameterToAdd = new NpgsqlParameter($"@param_{property.ColumnName}", value);
+            if (property.PostgreSqlType.HasValue)
+                parameterToAdd.NpgsqlDbType = property.PostgreSqlType.Value;
+
             parameterToAdd.Value = value;
             parameters.Add(parameterToAdd);
         }

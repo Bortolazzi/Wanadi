@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace Wanadi.Common.Contracts.PropertyMappers;
@@ -9,6 +10,7 @@ public record PropertyDataType
     public PropertyDataType(PropertyInfo property)
     {
         PropertyInfo = property;
+        CompiledSetter = CreateSetter(property);
         Name = property.Name;
 
         var columnAttribute = property.GetAttribute<ColumnAttribute>();
@@ -42,6 +44,7 @@ public record PropertyDataType
     }
 
     public PropertyInfo PropertyInfo { get; set; }
+    public Action<object, object?>? CompiledSetter { get; set; }
     public string Name { get; set; }
     public string ColumnName
     {
@@ -54,4 +57,37 @@ public record PropertyDataType
     public bool AllowNull { get; set; } = false;
     public bool IgnoreOnInsert { get; set; } = false;
     public bool HasKeyAttribute { get; set; } = false;
+
+    public void SetValue(object instance, object? value)
+    {
+        if (CompiledSetter is not null)
+        {
+            CompiledSetter(instance, value);
+            return;
+        }
+
+        PropertyInfo.SetValue(instance, value, null);
+    }
+
+    private static Action<object, object?>? CreateSetter(PropertyInfo property)
+    {
+        if (property.SetMethod is null)
+            return null;
+
+        try
+        {
+            var instance = Expression.Parameter(typeof(object), "instance");
+            var value = Expression.Parameter(typeof(object), "value");
+            var convertedInstance = Expression.Convert(instance, property.DeclaringType!);
+            var convertedValue = Expression.Convert(value, property.PropertyType);
+            var propertyAccess = Expression.Property(convertedInstance, property);
+            var assign = Expression.Assign(propertyAccess, convertedValue);
+
+            return Expression.Lambda<Action<object, object?>>(assign, instance, value).Compile();
+        }
+        catch
+        {
+            return null;
+        }
+    }
 }

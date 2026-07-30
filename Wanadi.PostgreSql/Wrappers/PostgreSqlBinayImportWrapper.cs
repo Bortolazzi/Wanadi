@@ -96,7 +96,13 @@ public static partial class PostgreSqlWrapper
                         continue;
                     }
 
-                    await binaryImporter.WriteAsync(value, property.PostgreSqlType, cancellationToken);
+                    if (property.PostgreSqlType.HasValue)
+                    {
+                        await binaryImporter.WriteAsync(value, property.PostgreSqlType.Value, cancellationToken);
+                        continue;
+                    }
+
+                    await binaryImporter.WriteAsync(value, cancellationToken);
                 }
             }
 
