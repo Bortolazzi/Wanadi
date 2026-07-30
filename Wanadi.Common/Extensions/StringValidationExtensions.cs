@@ -61,7 +61,12 @@ public static  class StringValidationExtensions
         }
     }
 
-    public static bool IsCNPJ(this string strCNPJ)
+    public static bool IsCNPJ(this string? value)
+    {
+        return CnpjHelper.IsCnpj(value);
+    }
+
+    public static bool IsOldCNPJ(this string strCNPJ)
     {
         if (string.IsNullOrEmpty(strCNPJ))
             return false;

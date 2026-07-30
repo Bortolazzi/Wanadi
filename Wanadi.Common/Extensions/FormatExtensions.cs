@@ -7,6 +7,8 @@ public static class StringFormatExtensions
         if (string.IsNullOrWhiteSpace(cnpj))
             return cnpj;
 
+        cnpj = cnpj.RemoveDocumentMask();
+
         if (cnpj.Length > 2)
             cnpj = cnpj.Insert(2, ".");
         if (cnpj.Length > 6)
@@ -24,6 +26,8 @@ public static class StringFormatExtensions
         if (string.IsNullOrWhiteSpace(cpf))
             return cpf;
 
+        cpf = cpf.RemoveDocumentMask();
+
         if (cpf.Length > 3)
             cpf = cpf.Insert(3, ".");
         if (cpf.Length > 7)
@@ -33,4 +37,13 @@ public static class StringFormatExtensions
 
         return cpf;
     }
+
+    public static string ToFormattedInteger(this long value)
+        => value.ToString("N0");
+
+    public static string ToFormattedInteger(this int value)
+        => value.ToString("N0");
+
+    public static string ToFormattedMoney(this decimal value)
+        => value.ToString("N2");
 }
