@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using Newtonsoft.Json;
+using Wanadi.Common.Contracts.Configurations;
 using Wanadi.Common.Contracts.RestApi;
 
 namespace Wanadi.Common.Clients;
@@ -46,6 +47,15 @@ public abstract class RestApiClient : IDisposable
     private string MediaType => "application/json";
 
     private Uri? BaseUri { get; set; }
+
+    public RestApiClient(IHttpClientFactory _httpClientFactory, HttpClientCookieContainerProvider cookieContainerProvider, string? httpClientName = null) : this(_httpClientFactory, cookieContainerProvider, Encoding.UTF8, httpClientName) { }
+
+    public RestApiClient(IHttpClientFactory _httpClientFactory, HttpClientCookieContainerProvider cookieContainerProvider, Encoding defaultEncoding, string? httpClientName = null)
+    {
+        DefaultEncoding = defaultEncoding;
+        _cookieContainer = cookieContainerProvider.Get(httpClientName);
+        _httpClient = httpClientName is not { Length: > 0 } ? _httpClientFactory.CreateClient() : _httpClientFactory.CreateClient(httpClientName);
+    }
 
     public RestApiClient(IHttpClientFactory _httpClientFactory, CookieContainer cookieContainer, string? httpClientName = null) : this(_httpClientFactory, cookieContainer, Encoding.UTF8, httpClientName) { }
 
@@ -878,7 +888,8 @@ public abstract class RestApiClient : IDisposable
         Encoding? encoding,
         CancellationToken cancellationToken)
     {
-        using (var httpResponseMessage = await SendAsync(fullUriOrPathUri, httpMethod, body, headers, cancellationToken))
+        using (var requestMessage = BuildRequestMessage(fullUriOrPathUri, httpMethod, body, headers))
+        using (var httpResponseMessage = await _httpClient.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
             return await RestApiResponse.ReadResponseAsync(httpResponseMessage, encoding ?? DefaultEncoding, _cookieContainer, cancellationToken);
     }
 
@@ -890,7 +901,8 @@ public abstract class RestApiClient : IDisposable
         Encoding? encoding,
         CancellationToken cancellationToken) where TResponse : class
     {
-        using (var httpResponseMessage = await SendAsync(fullUriOrPathUri, httpMethod, body, headers, cancellationToken))
+        using (var requestMessage = BuildRequestMessage(fullUriOrPathUri, httpMethod, body, headers))
+        using (var httpResponseMessage = await _httpClient.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
             return await RestApiResponse<TResponse>.ReadResponseAsync(httpResponseMessage, encoding ?? DefaultEncoding, _cookieContainer, IgnoreResponseDeserializeError, cancellationToken);
     }
 
@@ -902,7 +914,8 @@ public abstract class RestApiClient : IDisposable
         Encoding? encoding,
         CancellationToken cancellationToken) where TResponse : class where TError : class
     {
-        using (var httpResponseMessage = await SendAsync(fullUriOrPathUri, httpMethod, body, headers, cancellationToken))
+        using (var requestMessage = BuildRequestMessage(fullUriOrPathUri, httpMethod, body, headers))
+        using (var httpResponseMessage = await _httpClient.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
             return await RestApiResponse<TResponse, TError>.ReadResponseAsync(httpResponseMessage, encoding ?? DefaultEncoding, _cookieContainer, IgnoreResponseDeserializeError, cancellationToken);
     }
 
@@ -913,19 +926,9 @@ public abstract class RestApiClient : IDisposable
         Dictionary<string, string>? headers,
         CancellationToken cancellationToken)
     {
-        using (var httpResponseMessage = await SendAsync(fullUriOrPathUri, httpMethod, body, headers, cancellationToken))
+        using (var requestMessage = BuildRequestMessage(fullUriOrPathUri, httpMethod, body, headers))
+        using (var httpResponseMessage = await _httpClient.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
             return await RestApiFileResponse.DownloadResponseAsync(httpResponseMessage, _cookieContainer, cancellationToken);
-    }
-
-    private async Task<HttpResponseMessage> SendAsync(
-        string fullUriOrPathUri,
-        HttpMethod httpMethod,
-        object? body,
-        Dictionary<string, string>? headers,
-        CancellationToken cancellationToken)
-    {
-        using (var _message = BuildRequestMessage(fullUriOrPathUri, httpMethod, body, headers))
-            return await _httpClient.SendAsync(_message, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
     }
 
     private HttpRequestMessage BuildRequestMessage(

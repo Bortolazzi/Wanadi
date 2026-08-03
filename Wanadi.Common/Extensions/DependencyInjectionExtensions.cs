@@ -41,10 +41,17 @@ public static class DependencyInjectionExtensions
 
     public static IServiceCollection AddHttpClientConfigurations(this IServiceCollection services, IConfiguration configuration)
     {
-        var cookieContainer = new CookieContainer();
+        services.AddSingleton<HttpClientCookieContainerProvider>();
 
-        services.AddSingleton(cookieContainer);
-        services.AddHttpClient();
+        services.AddHttpClient(string.Empty)
+                .ConfigurePrimaryHttpMessageHandler(sp =>
+                {
+                    var cookieContainerProvider = sp.GetRequiredService<HttpClientCookieContainerProvider>();
+                    return new HttpClientHandler
+                    {
+                        CookieContainer = cookieContainerProvider.Get(null)
+                    };
+                });
 
         var httpClientConfigurations = configuration.GetSection("HttpClientConfigurations").Get<List<HttpClientConfiguration>>();
         if (httpClientConfigurations is not { Count: > 0 })
@@ -59,13 +66,15 @@ public static class DependencyInjectionExtensions
             {
                 client.Timeout = TimeSpan.FromSeconds(httpClientConfig.TimeoutSeconds.GetValueOrDefault(60));
             })
-            .ConfigurePrimaryHttpMessageHandler(_ =>
+            .ConfigurePrimaryHttpMessageHandler(sp =>
             {
+                var cookieContainerProvider = sp.GetRequiredService<HttpClientCookieContainerProvider>();
+
                 var handler = new HttpClientHandler
                 {
                     AllowAutoRedirect = httpClientConfig.AllowAutoRedirect,
                     UseCookies = httpClientConfig.UseCookies,
-                    CookieContainer = cookieContainer,
+                    CookieContainer = cookieContainerProvider.Get(httpClientConfig.Name),
                 };
 
                 if (httpClientConfig.AllowByPassCertificateCheck)

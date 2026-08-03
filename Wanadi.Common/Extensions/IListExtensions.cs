@@ -33,7 +33,11 @@ public static class IListExtensions
         if (list == null)
             return null;
 
-        var objectType = list.GetType().GetGenericArguments()[0];
+        var genericArguments = list.GetType().GetGenericArguments();
+        if (genericArguments.Length == 0)
+            return null;
+
+        var objectType = genericArguments[0];
 
         return objectType.GetTableName();
     }

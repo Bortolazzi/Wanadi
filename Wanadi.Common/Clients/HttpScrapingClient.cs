@@ -1,4 +1,5 @@
 using System.Net;
+using Wanadi.Common.Contracts.Configurations;
 using Wanadi.Common.Contracts.HttpScraping;
 
 namespace Wanadi.Common.Clients;
@@ -8,6 +9,15 @@ public abstract class HttpScrapingClient : IDisposable
     protected Encoding DefaultEncoding { get; set; }
     protected readonly HttpClient _httpClient;
     protected readonly CookieContainer _cookieContainer;
+
+    public HttpScrapingClient(IHttpClientFactory _httpClientFactory, HttpClientCookieContainerProvider cookieContainerProvider, string? httpClientName = null) : this(_httpClientFactory, cookieContainerProvider, Encoding.UTF8, httpClientName) { }
+
+    public HttpScrapingClient(IHttpClientFactory _httpClientFactory, HttpClientCookieContainerProvider cookieContainerProvider, Encoding defaultEncoding, string? httpClientName = null)
+    {
+        DefaultEncoding = defaultEncoding;
+        _cookieContainer = cookieContainerProvider.Get(httpClientName);
+        _httpClient = httpClientName is not { Length: > 0 } ? _httpClientFactory.CreateClient() : _httpClientFactory.CreateClient(httpClientName);
+    }
 
     public HttpScrapingClient(IHttpClientFactory _httpClientFactory, CookieContainer cookieContainer, string? httpClientName = null) : this(_httpClientFactory, cookieContainer, Encoding.UTF8, httpClientName) { }
 
@@ -50,7 +60,8 @@ public abstract class HttpScrapingClient : IDisposable
         Encoding? encoding,
         CancellationToken cancellationToken)
     {
-        using (var httpResponseMessage = await SendAsync(fullUriOrPathUri, httpMethod, requestContent, headers, cancellationToken))
+        using (var requestMessage = BuildRequestMessage(fullUriOrPathUri, httpMethod, requestContent, headers))
+        using (var httpResponseMessage = await _httpClient.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
             return await HttpScrapingResponse.ReadResponseAsync(httpResponseMessage, encoding ?? DefaultEncoding, _cookieContainer, cancellationToken);
     }
 
@@ -61,19 +72,9 @@ public abstract class HttpScrapingClient : IDisposable
         Dictionary<string, string>? headers,
         CancellationToken cancellationToken)
     {
-        using (var httpResponseMessage = await SendAsync(fullUriOrPathUri, httpMethod, requestContent, headers, cancellationToken))
+        using (var requestMessage = BuildRequestMessage(fullUriOrPathUri, httpMethod, requestContent, headers))
+        using (var httpResponseMessage = await _httpClient.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
             return await HttpScrapingFileResponse.DownloadResponseAsync(httpResponseMessage, _cookieContainer, cancellationToken);
-    }
-
-    private async Task<HttpResponseMessage> SendAsync(
-        string fullUriOrPathUri,
-        HttpMethod httpMethod,
-        object? requestContent,
-        Dictionary<string, string>? headers,
-        CancellationToken cancellationToken)
-    {
-        using (var _message = BuildRequestMessage(fullUriOrPathUri, httpMethod, requestContent, headers))
-            return await _httpClient.SendAsync(_message, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
     }
 
     private HttpRequestMessage BuildRequestMessage(

@@ -30,7 +30,7 @@ public sealed record HttpScrapingFileResponse
         using (var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync(cancellationToken))
         using (var fileStream = new FileStream(response.TempFilePath, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: 81920, useAsync: true))
         {
-            await contentStream.CopyToAsync(fileStream);
+            await contentStream.CopyToAsync(fileStream, cancellationToken);
         }
 
         foreach (var header in httpResponseMessage.Headers)

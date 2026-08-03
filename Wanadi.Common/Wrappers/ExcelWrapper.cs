@@ -79,34 +79,55 @@ public static class ExcelWrapper
         return response;
     }
 
-    private static void FormatStyleCells(ExcelWorksheet worksheet)
+    private static void FormatStyleColumns<T>(ExcelWorksheet worksheet)
     {
-        ExcelCellAddress start = worksheet.Dimension.Start;
-        ExcelCellAddress end = worksheet.Dimension.End;
+        if (worksheet.Dimension == null)
+            return;
 
-        for (int row = start.Row; row <= end.Row; row++)
+        var properties = typeof(T).GetProperties()
+                                  .ToDictionary(t => t.Name, t => t.PropertyType, StringComparer.OrdinalIgnoreCase);
+
+        FormatStyleColumns(worksheet, properties);
+    }
+
+    private static void FormatStyleColumns(ExcelWorksheet worksheet, DataTable sourceData)
+    {
+        if (worksheet.Dimension == null)
+            return;
+
+        var columns = sourceData.Columns
+                                .Cast<DataColumn>()
+                                .ToDictionary(t => t.ColumnName, t => t.DataType, StringComparer.OrdinalIgnoreCase);
+
+        FormatStyleColumns(worksheet, columns);
+    }
+
+    private static void FormatStyleColumns(ExcelWorksheet worksheet, Dictionary<string, Type> columns)
+    {
+        var headerRow = worksheet.Dimension.Start.Row;
+        var startColumn = worksheet.Dimension.Start.Column;
+        var endColumn = worksheet.Dimension.End.Column;
+
+        for (int col = startColumn; col <= endColumn; col++)
         {
-            for (int col = start.Column; col <= end.Column; col++)
-            {
-                if (worksheet.Cells[row, col].Value != null)
-                {
-                    var tipoCelula = worksheet.Cells[row, col].Value.GetType();
+            var header = worksheet.Cells[headerRow, col].Text;
+            if (string.IsNullOrEmpty(header) || !columns.TryGetValue(header, out var columnType))
+                continue;
 
-                    if (new[] { typeof(DateTime), typeof(DateTime?) }.Contains(tipoCelula))
-                    {
-                        worksheet.Cells[row, col].Style.Numberformat.Format = "dd/mm/yyyy";
-                    }
-                    else if (new[] { typeof(decimal), typeof(decimal?) }.Contains(tipoCelula))
-                    {
-                        worksheet.Cells[row, col].Style.Numberformat.Format = "_-* #,##0.00_-;-* #,##0.00_-;_-* \"-\"??_-;_-@_-";
-                    }
-                    else if (new[] { typeof(int), typeof(int?) }.Contains(tipoCelula))
-                    {
-                        worksheet.Cells[row, col].Style.Numberformat.Format = "0";
-                    }
-                }
-            }
+            ApplyNumberFormat(worksheet, col, columnType);
         }
+    }
+
+    private static void ApplyNumberFormat(ExcelWorksheet worksheet, int column, Type columnType)
+    {
+        var type = Nullable.GetUnderlyingType(columnType) ?? columnType;
+
+        if (type == typeof(DateTime))
+            worksheet.Column(column).Style.Numberformat.Format = "dd/mm/yyyy";
+        else if (type == typeof(decimal))
+            worksheet.Column(column).Style.Numberformat.Format = "_-* #,##0.00_-;-* #,##0.00_-;_-* \"-\"??_-;_-@_-";
+        else if (type == typeof(int))
+            worksheet.Column(column).Style.Numberformat.Format = "0";
     }
 
     private static void FormatHeader(ExcelWorksheet worksheet, string firstCell, string lastCell)
@@ -232,7 +253,7 @@ public static class ExcelWrapper
             string lastCell = ExcelWrapper.GetCellLetter(worksheet.Dimension.Address, 1);
 
             if (reviewStyleCell)
-                ExcelWrapper.FormatStyleCells(worksheet);
+                ExcelWrapper.FormatStyleColumns<T>(worksheet);
 
             ExcelWrapper.FormatHeader(worksheet, "A1", lastCell);
             ExcelWrapper.ApplyNicknames(worksheet, columnsNickname);
@@ -271,7 +292,7 @@ public static class ExcelWrapper
             string lastCell = ExcelWrapper.GetCellLetter(worksheet.Dimension.Address, 1);
 
             if (reviewStyleCell)
-                ExcelWrapper.FormatStyleCells(worksheet);
+                ExcelWrapper.FormatStyleColumns(worksheet, sourceData);
 
             ExcelWrapper.FormatHeader(worksheet, "A1", lastCell);
             ExcelWrapper.ApplyNicknames(worksheet, columnsNickname);
@@ -279,6 +300,24 @@ public static class ExcelWrapper
 
             await excelPackage.SaveAsync();
         }
+    }
+
+    public static async Task JsonToFileAsync(string fileName, string json, string worksheetName, bool reviewStyleCell, bool flattenNestedObjects = true)
+        => await JsonToFileAsync(fileName, json, worksheetName, reviewStyleCell, flattenNestedObjects, null);
+
+    public static async Task JsonToFileAsync(string fileName, string json, string worksheetName, bool reviewStyleCell, bool flattenNestedObjects, List<ExcelWrapperColumnNickname>? columnsNickname, params int[] columnsRemove)
+    {
+        var sourceData = JsonHelper.JsonArrayToDataTable(json, flattenNestedObjects);
+        await DataTableToFileAsync(fileName, sourceData, worksheetName, reviewStyleCell, columnsNickname, columnsRemove);
+    }
+
+    public static async Task JsonFileToFileAsync(string fileName, string jsonFilePath, string worksheetName, bool reviewStyleCell, bool flattenNestedObjects = true)
+        => await JsonFileToFileAsync(fileName, jsonFilePath, worksheetName, reviewStyleCell, flattenNestedObjects, null);
+
+    public static async Task JsonFileToFileAsync(string fileName, string jsonFilePath, string worksheetName, bool reviewStyleCell, bool flattenNestedObjects, List<ExcelWrapperColumnNickname>? columnsNickname, params int[] columnsRemove)
+    {
+        var json = await File.ReadAllTextAsync(jsonFilePath);
+        await JsonToFileAsync(fileName, json, worksheetName, reviewStyleCell, flattenNestedObjects, columnsNickname, columnsRemove);
     }
 
     public static async Task ExportToExcelAsync<T>(this List<T> sourceData, string fileName, string worksheetName, bool reviewStyleCell)
@@ -292,4 +331,10 @@ public static class ExcelWrapper
 
     public static async Task ExportToExcelAsync(this DataTable sourceData, string fileName, string worksheetName, bool reviewStyleCell, List<ExcelWrapperColumnNickname>? columnsNickname, params int[] columnsRemove)
         => await DataTableToFileAsync(fileName, sourceData, worksheetName, reviewStyleCell, columnsNickname, columnsRemove);
+
+    public static async Task ExportJsonToExcelAsync(this string json, string fileName, string worksheetName, bool reviewStyleCell, bool flattenNestedObjects = true)
+        => await JsonToFileAsync(fileName, json, worksheetName, reviewStyleCell, flattenNestedObjects);
+
+    public static async Task ExportJsonToExcelAsync(this string json, string fileName, string worksheetName, bool reviewStyleCell, bool flattenNestedObjects, List<ExcelWrapperColumnNickname>? columnsNickname, params int[] columnsRemove)
+        => await JsonToFileAsync(fileName, json, worksheetName, reviewStyleCell, flattenNestedObjects, columnsNickname, columnsRemove);
 }

@@ -109,11 +109,12 @@ public static class HttpResponseMessageExtensions
     ///         en-US: Message content read in text using the informed encoding.
     ///     </para>
     /// </returns>
-    public static async Task<string> ReadContentToStringAsync(this HttpResponseMessage responseMessage, Encoding encoding, CancellationToken cancellationToken)
+    public static async Task<string> ReadContentToStringAsync(this HttpResponseMessage responseMessage, Encoding encoding, CancellationToken cancellationToken, bool htmlDecode = true)
     {
         using var stream = await responseMessage.Content.ReadAsStreamAsync(cancellationToken);
         using var reader = new StreamReader(stream, encoding);
-        return HttpUtility.HtmlDecode(await reader.ReadToEndAsync());
+        var content = await reader.ReadToEndAsync();
+        return htmlDecode ? HttpUtility.HtmlDecode(content) : content;
     }
 
     public static string GetExtensionFromResponse(this HttpResponseMessage response)

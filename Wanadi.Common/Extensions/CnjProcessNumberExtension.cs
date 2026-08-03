@@ -2,14 +2,27 @@ namespace Wanadi.Common.Extensions;
 
 public static class CnjProcessNumberExtension
 {
-    public static bool IsValidCnjProcessNumber(this string cnj)
+    public static bool IsValidCnjProcessNumber(this string? cnj)
     {
-        if (cnj.Length != 20)
+        var cleaned = cnj.RemoveNotNumeric();
+
+        if (cleaned.Length != 20)
             return false;
 
-        var operationDv = int.Parse(cnj[..7]) % 97;
-        var operation1 = long.Parse($"{operationDv}{cnj.Substring(9, 4)}{cnj.Substring(13, 1)}{cnj.Substring(14, 2)}") % 97;
-        var operation2 = long.Parse($"{operation1}{cnj.Substring(16, 4)}{cnj.Substring(7, 2)}") % 97;
+        if (!int.TryParse(cleaned[..7], out var sequentialNumber))
+            return false;
+
+        var operationDv = sequentialNumber % 97;
+
+        if (!long.TryParse($"{operationDv}{cleaned.Substring(9, 4)}{cleaned.Substring(13, 1)}{cleaned.Substring(14, 2)}", out var firstOperationValue))
+            return false;
+
+        var operation1 = firstOperationValue % 97;
+
+        if (!long.TryParse($"{operation1}{cleaned.Substring(16, 4)}{cleaned.Substring(7, 2)}", out var secondOperationValue))
+            return false;
+
+        var operation2 = secondOperationValue % 97;
 
         return operation2 == 1;
     }

@@ -143,7 +143,7 @@ public class RestApiResponse
         response.StatusCode = httpResponseMessage.StatusCode;
         response.MediaType = httpResponseMessage.Content.Headers.ContentType?.MediaType;
         response.IsSuccessStatusCode = httpResponseMessage.IsSuccessStatusCode;
-        response.Content = await httpResponseMessage.ReadContentToStringAsync(encoding, cancellationToken);
+        response.Content = await httpResponseMessage.ReadContentToStringAsync(encoding, cancellationToken, htmlDecode: false);
 
         foreach (var header in httpResponseMessage.Headers)
             response.Headers.Add(header.Key, new StringValues(header.Value.ToArray()));
