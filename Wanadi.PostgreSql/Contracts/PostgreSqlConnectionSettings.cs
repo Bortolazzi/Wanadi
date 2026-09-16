@@ -9,7 +9,7 @@ public record PostgreSqlConnectionSettings
     public int? Timeout { get; set; } = 15;
     public int? CommandTimeout { get; set; } = 30;
     public int? CancellationTimeout { get; set; } = 2000;
-    public int? MaxPoolSize { get; set; } = 5000;
+    public int? MaxPoolSize { get; set; } = 100;
     public int? KeepAlive { get; set; } = 0;
     public bool? IncludeErrorDetail { get; set; } = false;
 }

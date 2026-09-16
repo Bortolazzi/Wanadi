@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.Globalization;
+using Npgsql;
 using Wanadi.Common.Extensions;
 using Wanadi.PostgreSql.Examples;
 using Wanadi.PostgreSql.Wrappers;
@@ -16,7 +17,8 @@ var lista10000 = GenerateData(10000);
 var lista100000 = GenerateData(100000);
 var lista1000000 = GenerateData(1000000);
 
-var repository = new TableRepository(connectionString);
+await using var dataSource = NpgsqlDataSource.Create(connectionString);
+var repository = new TableRepository(dataSource);
 
 var readingTest = await repository.QueryAsync<TableEntity>("select * from  table_test");
 

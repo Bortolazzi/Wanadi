@@ -12,13 +12,8 @@ public abstract class WanadiPostgreSqlRepository<TEntity> : IWanadiPostgreSqlRep
     private readonly NpgsqlDataSource _dataSource;
     private readonly ConcurrentDictionary<string, List<PostgreSqlPropertyDataType>> _propertyMapCache = new();
 
-    public WanadiPostgreSqlRepository(string connectionString)
-        => _dataSource = NpgsqlDataSource.Create(connectionString);
-
-    public WanadiPostgreSqlRepository(PostgreSqlConnectionSettings settings, string databaseName)
-        : this(PostgreSqlWrapper.BuildConnectionString(settings, databaseName))
-    {
-    }
+    public WanadiPostgreSqlRepository(NpgsqlDataSource dataSource)
+        => _dataSource = dataSource;
 
     public string GetTableName()
         => typeof(TEntity).GetTableName();
@@ -285,6 +280,5 @@ public abstract class WanadiPostgreSqlRepository<TEntity> : IWanadiPostgreSqlRep
 
     public void Dispose()
     {
-        _dataSource.Dispose();
     }
 }
