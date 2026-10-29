@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/Docs/">
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
+  <Project Path="Wanadi.Common.Examples/Wanadi.Common.Examples.csproj" />
+  <Project Path="Wanadi.Common/Wanadi.Common.csproj" />
+  <Project Path="Wanadi.PostgreSql.Examples/Wanadi.PostgreSql.Examples.csproj" />
+  <Project Path="Wanadi.PostgreSql/Wanadi.PostgreSql.csproj" />
+</Solution>

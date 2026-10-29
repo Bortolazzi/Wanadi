@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<NoWarn>$(NoWarn);NU1803</NoWarn>
-		<Version>8.8.0</Version>
+		<Version>10.0.0</Version>
 		<Authors>Renato Bortolazzi Junior</Authors>
 		<PackageDescription>Funcionalidades comuns utilizadas em projetos e nos Pacotes Wanadi.</PackageDescription>
 		<RepositoryUrl>https://github.com/Bortolazzi/Wanadi</RepositoryUrl>
@@ -17,6 +17,7 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.ProgramSynthesis.Detection" Version="10.4.1" />
 		<PackageReference Include="EPPlus" Version="7.5.2" />
+		<PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
 		<PackageReference Include="UTF.Unknown" Version="2.6.0" />
 	</ItemGroup>
 	<ItemGroup>
